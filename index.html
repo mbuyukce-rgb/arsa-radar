@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arsa Radar</title>
+<style>
+body{font-family:system-ui;margin:0;background:#eef2f6;color:#152033}
+.hero{background:#0b1220;color:#fff;padding:48px 24px}.wrap{max-width:1100px;margin:auto}
+.card{background:#fff;border-radius:16px;padding:24px;margin:20px 0}
+.grid,.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+input,select{width:100%;padding:11px;border:1px solid #ccd4df;border-radius:9px;box-sizing:border-box}
+button{padding:11px 15px;border:0;border-radius:9px;background:#0b1220;color:white;font-weight:700;cursor:pointer}
+.stat{background:#f5f7fa;padding:15px;border-radius:10px}.stat b{display:block;font-size:24px;margin-top:4px}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px;border-bottom:1px solid #e1e5ea}
+@media(max-width:700px){.grid,.stats{grid-template-columns:1fr 1fr}}
+@media(max-width:450px){.grid,.stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap"><h1>Arsa Radar</h1><p>En ucuz değil; fiyatına göre gelişim potansiyeli en yüksek parseli bul.</p></div></header>
+<main class="wrap">
+<section class="card">
+<h2>Fırsat Taraması</h2>
+<div class="grid">
+<div><label>İl</label><select id="il"><option value="">Hepsi</option><option>İstanbul</option></select></div>
+<div><label>İlçe</label><select id="ilce"><option value="">Hepsi</option><option>Çatalca</option></select></div>
+<div><label>Mahalle</label><input id="mah" placeholder="Ovayenice"></div>
+<div><label>Maks. bütçe TL</label><input id="butce" type="number" value="30000000"></div>
+<div><label>Maks. TL/m²</label><input id="m2max" type="number" value="5000"></div>
+<div><label>Min. alan m²</label><input id="amin" type="number" value="300"></div>
+<div><label>Max. alan m²</label><input id="amax" type="number" value="30000"></div>
+<div><label>Min. skor</label><input id="smin" type="number" value="0"></div>
+</div>
+<p><label><input id="dog" type="checkbox" style="width:auto"> Yalnızca doğrulanmış parseller</label></p>
+<button onclick="tara()">🔎 Fırsatları sırala</button>
+</section>
+<section class="card"><h2>Radar Özeti</h2>
+<div class="stats">
+<div class="stat">Aday<b id="n">0</b></div><div class="stat">Ortalama skor<b id="avg">—</b></div>
+<div class="stat">En düşük TL/m²<b id="low">—</b></div><div class="stat">Doğrulanmış<b id="ver">0</b></div>
+</div></section>
+<section class="card"><h2>Sonuçlar</h2><div style="overflow:auto">
+<table><thead><tr><th>Skor</th><th>Konum</th><th>Parsel</th><th>Alan</th><th>Fiyat</th><th>TL/m²</th><th>Durum</th></tr></thead>
+<tbody id="rows"></tbody></table></div></section>
+<section class="card"><h2>Doğrulama Kapısı</h2>
+<p>İlan bilgileri nihai karar değildir. Ada/parsel, TKGM, imar planı, yol/terk, 18. madde ve diğer hukuki kısıtlar resmî kaynaklardan ayrıca doğrulanmalıdır.</p>
+</section>
+</main>
+<script>
+const D=[
+['İstanbul','Çatalca','Ovayenice','134/11',9065.32,22000000,2426.82,76,true],
+['İstanbul','Çatalca','Ovayenice','190/58',5042,13400000,2657.68,65,true],
+['İstanbul','Çatalca','Ovayenice','—',9726,20500000,2107.75,70,false],
+['İstanbul','Çatalca','Ovayenice','—',4358,16250000,3728.77,55,false],
+['İstanbul','Çatalca','Ovayenice','—',7531,35000000,4646.93,48,false],
+['İstanbul','Çatalca','Ovayenice','—',1052,4900000,4657.79,45,false],
+['İstanbul','Çatalca','Ovayenice','—',1487,7500000,5043.04,40,false],
+['İstanbul','Çatalca','Ovayenice','—',515,1800000,3495.15,50,false],
+['İstanbul','Çatalca','Ovayenice','117/22',888,12000000,13513.51,20,true]
+];
+function tl(n){return new Intl.NumberFormat('tr-TR').format(Math.round(n))}
+function tara(){
+let il=document.getElementById('il').value,ilce=document.getElementById('ilce').value,
+mah=document.getElementById('mah').value.toLowerCase(),b=+document.getElementById('butce').value||Infinity,
+m=+document.getElementById('m2max').value||Infinity,amin=+document.getElementById('amin').value||0,
+amax=+document.getElementById('amax').value||Infinity,s=+document.getElementById('smin').value||0,
+only=document.getElementById('dog').checked;
+let r=D.filter(x=>(!il||x[0]==il)&&(!ilce||x[1]==ilce)&&(!mah||x[2].toLowerCase().includes(mah))&&x[5]<=b&&x[6]<=m&&x[4]>=amin&&x[4]<=amax&&x[7]>=s&&(!only||x[8])).sort((a,b)=>b[7]-a[7]);
+document.getElementById('n').textContent=r.length;
+document.getElementById('ver').textContent=r.filter(x=>x[8]).length;
+document.getElementById('avg').textContent=r.length?Math.round(r.reduce((a,x)=>a+x[7],0)/r.length):'—';
+document.getElementById('low').textContent=r.length?tl(Math.min(...r.map(x=>x[6])))+' TL':'—';
+document.getElementById('rows').innerHTML=r.map(x=>`<tr><td><b>${x[7]}/100</b></td><td>${x[2]}<br>${x[1]}</td><td>${x[3]}</td><td>${tl(x[4])} m²</td><td>${tl(x[5])} TL</td><td>${tl(x[6])} TL</td><td>${x[8]?'🟢 Doğrulanmış':'🟡 Aday'}</td></tr>`).join('')
+}
+tara();
+</script>
+</body></html>
