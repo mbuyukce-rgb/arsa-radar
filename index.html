@@ -3,50 +3,132 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Arsa Radar</title>
+<title>Arsa Radar V2 — Fırsat & Doğrulama Sistemi</title>
 <style>
-body{font-family:system-ui;margin:0;background:#eef2f6;color:#152033}
-.hero{background:#0b1220;color:#fff;padding:48px 24px}.wrap{max-width:1100px;margin:auto}
-.card{background:#fff;border-radius:16px;padding:24px;margin:20px 0}
-.grid,.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-input,select{width:100%;padding:11px;border:1px solid #ccd4df;border-radius:9px;box-sizing:border-box}
-button{padding:11px 15px;border:0;border-radius:9px;background:#0b1220;color:white;font-weight:700;cursor:pointer}
-.stat{background:#f5f7fa;padding:15px;border-radius:10px}.stat b{display:block;font-size:24px;margin-top:4px}
-table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px;border-bottom:1px solid #e1e5ea}
-@media(max-width:700px){.grid,.stats{grid-template-columns:1fr 1fr}}
-@media(max-width:450px){.grid,.stats{grid-template-columns:1fr}}
+:root{--navy:#0b1220;--bg:#eef2f6;--card:#fff;--muted:#64748b;--line:#dbe2ea;--green:#15803d;--yellow:#a16207;--red:#b91c1c;--blue:#075985}
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:var(--bg);color:#152033}
+.hero{background:linear-gradient(135deg,#0b1220,#17243a);color:#fff;padding:42px 20px}
+.wrap{max-width:1180px;margin:auto}
+h1{font-size:40px;margin:0 0 8px}
+h2{font-size:27px;margin:0 0 18px}
+h3{margin:0 0 8px}
+p{line-height:1.55}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;margin:20px 0;box-shadow:0 3px 15px rgba(15,23,42,.04)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+label{font-weight:700;display:block;margin-bottom:6px}
+input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit}
+button,.btn{display:inline-block;padding:12px 16px;border:0;border-radius:10px;background:var(--navy);color:#fff;font-weight:800;cursor:pointer;text-decoration:none}
+.btn.secondary{background:#fff;color:var(--navy);border:1px solid #cbd5e1}
+.btn.blue{background:#075985}
+.btn.green{background:#15803d}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:#f5f7fa;padding:16px;border-radius:12px;border:1px solid #e5e7eb}
+.stat span{display:block;color:var(--muted);font-weight:700}.stat b{display:block;font-size:27px;margin-top:5px}
+table{width:100%;border-collapse:collapse;min-width:800px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid #e5e7eb;vertical-align:top}
+th{background:#f8fafc}
+.badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}
+.badge.green{background:#dcfce7;color:#166534}.badge.yellow{background:#fef3c7;color:#92400e}.badge.red{background:#fee2e2;color:#991b1b}
+.focus{border:2px solid #0f172a;background:#f8fafc}
+.checks{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.check{border:1px solid var(--line);border-radius:12px;padding:15px;background:#fff}
+.check strong{display:block;margin-bottom:5px}.muted{color:var(--muted)}
+.notice{padding:14px 16px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12}
+footer{padding:30px 20px;color:var(--muted);text-align:center}
+@media(max-width:800px){.grid,.stats{grid-template-columns:1fr 1fr}.checks{grid-template-columns:1fr}}
+@media(max-width:500px){.grid,.stats{grid-template-columns:1fr}h1{font-size:32px}.card{padding:18px}}
 </style>
 </head>
 <body>
-<header class="hero"><div class="wrap"><h1>Arsa Radar</h1><p>En ucuz değil; fiyatına göre gelişim potansiyeli en yüksek parseli bul.</p></div></header>
+<header class="hero">
+<div class="wrap">
+<h1>Arsa Radar</h1>
+<p>En ucuz parseli değil, <b>fiyatına göre gelişim potansiyeli en yüksek</b> adayı bul.</p>
+<p class="muted" style="color:#cbd5e1">V2 — fırsat taraması + özel parsel doğrulama kapısı</p>
+</div>
+</header>
+
 <main class="wrap">
+
 <section class="card">
-<h2>Fırsat Taraması</h2>
+<h2>1. Fırsat Taraması</h2>
 <div class="grid">
 <div><label>İl</label><select id="il"><option value="">Hepsi</option><option>İstanbul</option></select></div>
 <div><label>İlçe</label><select id="ilce"><option value="">Hepsi</option><option>Çatalca</option></select></div>
-<div><label>Mahalle</label><input id="mah" placeholder="Ovayenice"></div>
-<div><label>Maks. bütçe TL</label><input id="butce" type="number" value="30000000"></div>
+<div><label>Mahalle</label><input id="mah" value="Ovayenice" placeholder="Örn. Ovayenice"></div>
+<div><label>Maks. bütçe (TL)</label><input id="butce" type="number" value="30000000"></div>
 <div><label>Maks. TL/m²</label><input id="m2max" type="number" value="5000"></div>
-<div><label>Min. alan m²</label><input id="amin" type="number" value="300"></div>
-<div><label>Max. alan m²</label><input id="amax" type="number" value="30000"></div>
+<div><label>Min. alan (m²)</label><input id="amin" type="number" value="300"></div>
+<div><label>Max. alan (m²)</label><input id="amax" type="number" value="30000"></div>
 <div><label>Min. skor</label><input id="smin" type="number" value="0"></div>
 </div>
-<p><label><input id="dog" type="checkbox" style="width:auto"> Yalnızca doğrulanmış parseller</label></p>
-<button onclick="tara()">🔎 Fırsatları sırala</button>
+<p style="margin-top:16px"><label style="display:inline"><input id="dog" type="checkbox" style="width:auto"> Yalnızca doğrulanmış parseller</label></p>
+<div class="actions"><button onclick="tara()">🔎 Fırsatları sırala</button><button class="btn secondary" onclick="resetForm()">↺ Varsayılanlara dön</button></div>
 </section>
-<section class="card"><h2>Radar Özeti</h2>
+
+<section class="card">
+<h2>2. Radar Özeti</h2>
 <div class="stats">
-<div class="stat">Aday<b id="n">0</b></div><div class="stat">Ortalama skor<b id="avg">—</b></div>
-<div class="stat">En düşük TL/m²<b id="low">—</b></div><div class="stat">Doğrulanmış<b id="ver">0</b></div>
-</div></section>
-<section class="card"><h2>Sonuçlar</h2><div style="overflow:auto">
-<table><thead><tr><th>Skor</th><th>Konum</th><th>Parsel</th><th>Alan</th><th>Fiyat</th><th>TL/m²</th><th>Durum</th></tr></thead>
-<tbody id="rows"></tbody></table></div></section>
-<section class="card"><h2>Doğrulama Kapısı</h2>
-<p>İlan bilgileri nihai karar değildir. Ada/parsel, TKGM, imar planı, yol/terk, 18. madde ve diğer hukuki kısıtlar resmî kaynaklardan ayrıca doğrulanmalıdır.</p>
+<div class="stat"><span>Aday</span><b id="n">0</b></div>
+<div class="stat"><span>Ortalama skor</span><b id="avg">—</b></div>
+<div class="stat"><span>En düşük TL/m²</span><b id="low">—</b></div>
+<div class="stat"><span>Doğrulanmış</span><b id="ver">0</b></div>
+</div>
 </section>
+
+<section class="card">
+<h2>3. Sonuçlar</h2>
+<div style="overflow:auto">
+<table>
+<thead><tr><th>Skor</th><th>Konum</th><th>Parsel</th><th>Alan</th><th>Fiyat</th><th>TL/m²</th><th>Durum</th><th>İncele</th></tr></thead>
+<tbody id="rows"></tbody>
+</table>
+</div>
+</section>
+
+<section class="card focus" id="ozel">
+<h2>4. Özel Dosya — Çatalca / Ovayenice / 134 ada / 11 parsel</h2>
+<div class="stats">
+<div class="stat"><span>Tapu alanı</span><b>9.065,32 m²</b></div>
+<div class="stat"><span>İlan fiyatı</span><b>22.000.000 TL</b></div>
+<div class="stat"><span>İlan TL/m²</span><b>≈ 2.427 TL</b></div>
+<div class="stat"><span>Radar skoru</span><b>76/100</b></div>
+</div>
+<p><b>Mevcut kadastro bilgisi:</b> İstanbul → Çatalca → Ova Yenice Mahallesi → Ada 134 → Parsel 11. Nitelik: <b>Tarla</b>. Mevkii: Damlca. Pafta: F20-C-13-B-3.</p>
+<div class="notice"><b>Karar:</b> Güçlü aday. Ancak bu ekran yatırım onayı değildir. İmar hakkı, plan kararı, yol bağlantısı, terk/18. madde, sit/orman/tarım ve diğer hukuki kısıtlar resmî kaynaktan doğrulanmadan “imarlı arsa” veya “kesin gelişecek” kabul edilmez.</div>
+<div class="actions">
+<a class="btn blue" href="https://parselsorgu.tkgm.gov.tr/" target="_blank" rel="noopener">① TKGM Parsel Sorgu</a>
+<a class="btn secondary" href="https://planaski.ibb.gov.tr/" target="_blank" rel="noopener">② İBB Plan Askı</a>
+<a class="btn secondary" href="https://catalca.bel.tr/uploads/pdfs/document/askiya-cikan-imar-planlari/91aad3d9ce268-9011.pdf" target="_blank" rel="noopener">③ Çatalca Plan PDF</a>
+</div>
+</section>
+
+<section class="card">
+<h2>5. 134/11 Doğrulama Kapısı</h2>
+<p class="muted">Aşağıdaki maddeler “doğrulandı” olarak işaretlenmeden parseli satın alma kararı verme.</p>
+<div class="checks">
+<div class="check"><strong>1. Kadastro</strong><span id="c1">🟢 TKGM'de 134/11 görüldü; alan/nitelik kontrol edildi.</span></div>
+<div class="check"><strong>2. Geometri</strong><span id="c2">🟢 Haritadaki parsel geometrisi görüntülendi.</span></div>
+<div class="check"><strong>3. İmar / plan</strong><span>🟡 Ova Yenice + 134/11 için plan kaydı ayrıca doğrulanmalı.</span></div>
+<div class="check"><strong>4. Yol / ulaşım</strong><span>🟡 Kadastro yoluna fiilî ve hukuki bağlantı ayrıca kontrol edilmeli.</span></div>
+<div class="check"><strong>5. 18. madde / terk</strong><span>🔴 Resmî belge görülmeden doğrulanmış kabul edilmez.</span></div>
+<div class="check"><strong>6. Kısıtlar</strong><span>🟡 Tarım, orman, sit, dere, enerji hattı vb. katmanlar ayrıca kontrol edilmeli.</span></div>
+</div>
+</section>
+
+<section class="card">
+<h2>6. Sistem Durumu</h2>
+<p><b>Bu V2'nin yaptığı:</b> mevcut aday verilerini filtreler, skorlar, ucuzluk ve bütçe koşullarına göre sıralar ve 134/11 için ayrı doğrulama akışı sunar.</p>
+<p><b>Henüz yapmadığı:</b> TKGM/MEGSİS veya belediye sistemlerinden otomatik canlı parsel/imar verisi çekmez. Canlı resmî API erişimi olmadan “otomatik doğrulandı” sonucu üretmez.</p>
+<p><b>Sonraki teknik aşama:</b> yetkili/erişilebilir resmî servislerden veri alabilen backend + gerçek koordinat/plan katmanı + otomatik değişiklik takibi.</p>
+</section>
+
 </main>
+
+<footer>Arsa Radar V2 — analiz aracı. Nihai yatırım ve mülkiyet kararı öncesinde resmî kayıtlar esas alınmalıdır.</footer>
+
 <script>
 const D=[
 ['İstanbul','Çatalca','Ovayenice','134/11',9065.32,22000000,2426.82,76,true],
@@ -59,20 +141,55 @@ const D=[
 ['İstanbul','Çatalca','Ovayenice','—',515,1800000,3495.15,50,false],
 ['İstanbul','Çatalca','Ovayenice','117/22',888,12000000,13513.51,20,true]
 ];
+
 function tl(n){return new Intl.NumberFormat('tr-TR').format(Math.round(n))}
 function tara(){
-let il=document.getElementById('il').value,ilce=document.getElementById('ilce').value,
-mah=document.getElementById('mah').value.toLowerCase(),b=+document.getElementById('butce').value||Infinity,
-m=+document.getElementById('m2max').value||Infinity,amin=+document.getElementById('amin').value||0,
-amax=+document.getElementById('amax').value||Infinity,s=+document.getElementById('smin').value||0,
-only=document.getElementById('dog').checked;
-let r=D.filter(x=>(!il||x[0]==il)&&(!ilce||x[1]==ilce)&&(!mah||x[2].toLowerCase().includes(mah))&&x[5]<=b&&x[6]<=m&&x[4]>=amin&&x[4]<=amax&&x[7]>=s&&(!only||x[8])).sort((a,b)=>b[7]-a[7]);
+let il=document.getElementById('il').value;
+let ilce=document.getElementById('ilce').value;
+let mah=document.getElementById('mah').value.toLowerCase().trim();
+let b=+document.getElementById('butce').value||Infinity;
+let m=+document.getElementById('m2max').value||Infinity;
+let amin=+document.getElementById('amin').value||0;
+let amax=+document.getElementById('amax').value||Infinity;
+let s=+document.getElementById('smin').value||0;
+let only=document.getElementById('dog').checked;
+
+let r=D.filter(x=>
+(!il||x[0]==il)&&(!ilce||x[1]==ilce)&&
+(!mah||x[2].toLowerCase().includes(mah))&&
+x[5]<=b&&x[6]<=m&&x[4]>=amin&&x[4]<=amax&&x[7]>=s&&(!only||x[8])
+).sort((a,b)=>b[7]-a[7]);
+
 document.getElementById('n').textContent=r.length;
 document.getElementById('ver').textContent=r.filter(x=>x[8]).length;
 document.getElementById('avg').textContent=r.length?Math.round(r.reduce((a,x)=>a+x[7],0)/r.length):'—';
 document.getElementById('low').textContent=r.length?tl(Math.min(...r.map(x=>x[6])))+' TL':'—';
-document.getElementById('rows').innerHTML=r.map(x=>`<tr><td><b>${x[7]}/100</b></td><td>${x[2]}<br>${x[1]}</td><td>${x[3]}</td><td>${tl(x[4])} m²</td><td>${tl(x[5])} TL</td><td>${tl(x[6])} TL</td><td>${x[8]?'🟢 Doğrulanmış':'🟡 Aday'}</td></tr>`).join('')
+
+document.getElementById('rows').innerHTML=r.length?r.map((x,i)=>`
+<tr>
+<td><b>${x[7]}/100</b></td>
+<td>${x[2]}<br><span class="muted">${x[1]}</span></td>
+<td>${x[3]}</td>
+<td>${tl(x[4])} m²</td>
+<td>${tl(x[5])} TL</td>
+<td>${tl(x[6])} TL</td>
+<td><span class="badge ${x[8]?'green':'yellow'}">${x[8]?'Doğrulanmış':'Aday'}</span></td>
+<td>${x[3]=='134/11'?'<a class="btn secondary" href="#ozel">134/11</a>':'—'}</td>
+</tr>`).join(''):`<tr><td colspan="8">Filtrelere uyan aday bulunamadı.</td></tr>`;
+}
+function resetForm(){
+document.getElementById('il').value='';
+document.getElementById('ilce').value='';
+document.getElementById('mah').value='Ovayenice';
+document.getElementById('butce').value=30000000;
+document.getElementById('m2max').value=5000;
+document.getElementById('amin').value=300;
+document.getElementById('amax').value=30000;
+document.getElementById('smin').value=0;
+document.getElementById('dog').checked=false;
+tara();
 }
 tara();
 </script>
-</body></html>
+</body>
+</html>
