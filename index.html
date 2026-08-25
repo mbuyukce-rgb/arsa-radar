@@ -117,9 +117,79 @@ footer{padding:30px 20px;color:var(--muted);text-align:center}
 <div class="check"><strong>6. Kısıtlar</strong><span>🟡 Tarım, orman, sit, dere, enerji hattı vb. katmanlar ayrıca kontrol edilmeli.</span></div>
 </div>
 </section>
-
 <section class="card">
-<h2>6. Sistem Durumu</h2>
+<h2>6. Doğrulama Kayıtları — 134/11</h2>
+
+<p class="muted">
+Bu bölüm, parsel hakkında yaptığımız kontrollerin hangi kaynağa dayandığını
+ve hangi noktaların hâlâ açık olduğunu gösterir.
+</p>
+
+<table>
+<thead>
+<tr>
+<th>Kontrol</th>
+<th>Durum</th>
+<th>Kaynak</th>
+<th>Sonuç</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><b>Kadastro / parsel</b></td>
+<td><span class="badge green">DOĞRULANDI</span></td>
+<td>TKGM Parsel Sorgu</td>
+<td>134 ada / 11 parsel mevcut. Alan 9.065,32 m², nitelik Tarla.</td>
+</tr>
+
+<tr>
+<td><b>Parsel geometrisi</b></td>
+<td><span class="badge green">DOĞRULANDI</span></td>
+<td>TKGM harita görüntüsü</td>
+<td>134/11 parsel geometrisi harita üzerinde görüntülendi.</td>
+</tr>
+
+<tr>
+<td><b>İmar / plan</b></td>
+<td><span class="badge yellow">AÇIK</span></td>
+<td>İBB Plan Askı / Çatalca Belediyesi</td>
+<td>Ova Yenice + 134/11 için kesin plan kararı henüz resmî olarak doğrulanmadı.</td>
+</tr>
+
+<tr>
+<td><b>Yol / ulaşım</b></td>
+<td><span class="badge yellow">AÇIK</span></td>
+<td>TKGM + kadastro yolu kontrolü</td>
+<td>Haritada yol bağlantısı görülüyor; hukuki/fiilî erişim ayrıca doğrulanmalı.</td>
+</tr>
+
+<tr>
+<td><b>18. madde / terk</b></td>
+<td><span class="badge red">DOĞRULANMADI</span></td>
+<td>Resmî plan / kadastro belgeleri</td>
+<td>Resmî belge görülmeden “terk yoktur” veya “18. madde yoktur” denilemez.</td>
+</tr>
+
+<tr>
+<td><b>Tarım / orman / sit / diğer kısıtlar</b></td>
+<td><span class="badge yellow">AÇIK</span></td>
+<td>Resmî kurum ve harita katmanları</td>
+<td>Bu kısıtların tamamı henüz sistem tarafından otomatik doğrulanmış değildir.</td>
+</tr>
+</tbody>
+</table>
+
+<div class="notice" style="margin-top:18px">
+<b>Arsa Radar kuralı:</b>
+Bir madde “AÇIK” veya “DOĞRULANMADI” durumundayken sistem
+parseli “kesin imarlı”, “kesin değerlenecek” veya “satın alınmalı”
+olarak işaretlemez.
+</div>
+
+</section>
+<section class="card">
+<h2>7. Sistem Durumu</h2>
 <p><b>Bu V2'nin yaptığı:</b> mevcut aday verilerini filtreler, skorlar, ucuzluk ve bütçe koşullarına göre sıralar ve 134/11 için ayrı doğrulama akışı sunar.</p>
 <p><b>Henüz yapmadığı:</b> TKGM/MEGSİS veya belediye sistemlerinden otomatik canlı parsel/imar verisi çekmez. Canlı resmî API erişimi olmadan “otomatik doğrulandı” sonucu üretmez.</p>
 <p><b>Sonraki teknik aşama:</b> yetkili/erişilebilir resmî servislerden veri alabilen backend + gerçek koordinat/plan katmanı + otomatik değişiklik takibi.</p>
