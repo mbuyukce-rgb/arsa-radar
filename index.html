@@ -275,7 +275,7 @@ function geometryIntersection(A,B){
 }
 function calculateIntersection(){
   const box=document.getElementById("geoResult");
-  if(!parcelGeoJSON||!planGeoJSON){
+  if(!parcelGeoJSON || !planGeoJSON || !parcelGeoJSON.polygons || !planGeoJSON.polygons){
     box.className="geo-result open";
     box.innerHTML="<b>HESAPLANAMADI</b><p>Hem parsel hem plan geometrisini yüklemelisin. Eksik veri, kesişim varmış gibi yorumlanmaz.</p>";
     return;
