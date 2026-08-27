@@ -148,19 +148,73 @@ let parcelGeoJSON=null, planGeoJSON=null;
 function readGeoFile(inputId,statusId,target){
   const f=document.getElementById(inputId).files[0];
   if(!f)return;
+
   const r=new FileReader();
+
   r.onload=()=>{
     try{
-      const g=JSON.parse(r.result);
+      let g;
+
+      if(f.name.toLowerCase().endsWith(".kml")){
+        const xml=new DOMParser().parseFromString(r.result,"text/xml");
+
+        if(xml.querySelector("parsererror")){
+          throw new Error("KML dosyası okunamadı");
+        }
+
+        const polygons=[...xml.querySelectorAll("Polygon")].map(poly=>{
+          const rings=[...poly.querySelectorAll(":scope > outerBoundaryIs LinearRing, :scope > innerBoundaryIs LinearRing")]
+            .map(ring=>{
+              const text=ring.querySelector("coordinates")?.textContent||"";
+              return text.trim().split(/\s+/).map(c=>{
+                const p=c.split(",").map(Number);
+                return [p[0],p[1]];
+              }).filter(p=>Number.isFinite(p[0])&&Number.isFinite(p[1]));
+            })
+            .filter(ring=>ring.length>=3);
+
+          if(!rings.length)return null;
+
+          return {
+            type:"Feature",
+            properties:{},
+            geometry:{
+              type:"Polygon",
+              coordinates:rings
+            }
+          };
+        }).filter(Boolean);
+
+        if(!polygons.length){
+          throw new Error("KML içinde Polygon geometrisi bulunamadı");
+        }
+
+        g={
+          type:"FeatureCollection",
+          features:polygons
+        };
+
+      }else{
+        g=JSON.parse(r.result);
+      }
+
       const geom=normalizeGeoJSON(g);
-      if(!geom) throw new Error("Polygon/MultiPolygon bulunamadı");
+
+      if(!geom){
+        throw new Error("Polygon/MultiPolygon bulunamadı");
+      }
+
       window[target]=geom;
-      document.getElementById(statusId).textContent=`Yüklendi: ${f.name} · ${geom.polygons.length} poligon`;
+
+      document.getElementById(statusId).textContent=
+        `Yüklendi: ${f.name} · ${geom.polygons.length} poligon`;
+
     }catch(e){
       window[target]=null;
       document.getElementById(statusId).textContent="Hata: "+e.message;
     }
   };
+
   r.readAsText(f);
 }
 document.getElementById("parcelGeo").addEventListener("change",()=>readGeoFile("parcelGeo","parcelFileStatus","parcelGeoJSON"));
