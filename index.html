@@ -264,9 +264,24 @@ function ringsIntersect(r1,r2){
   return false;
 }
 function polyIntersect(a,b){
-  for(const ra of a) for(const rb of b) if(ringsIntersect(ra,rb)) return true;
-  if(a[0]&&a[0][0]&&polygonPointInside(a[0][0],b)) return true;
-  if(b[0]&&b[0][0]&&polygonPointInside(b[0][0],a)) return true;
+  if(!Array.isArray(a)||!Array.isArray(b)||!a.length||!b.length) return false;
+
+  for(const ra of a){
+    if(!Array.isArray(ra)||ra.length<2) continue;
+
+    for(const rb of b){
+      if(!Array.isArray(rb)||rb.length<2) continue;
+
+      if(ringsIntersect(ra,rb)) return true;
+    }
+  }
+
+  const ap=a[0]?.[0];
+  const bp=b[0]?.[0];
+
+  if(ap && polygonPointInside(ap,b)) return true;
+  if(bp && polygonPointInside(bp,a)) return true;
+
   return false;
 }
 function geometryIntersection(A,B){
