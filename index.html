@@ -204,8 +204,9 @@ function readGeoFile(inputId,statusId,target){
         throw new Error("Polygon/MultiPolygon bulunamadı");
       }
 
-      window[target]=geom;
-
+    if(target==="parcelGeoJSON") parcelGeoJSON=geom;
+else if(target==="planGeoJSON") planGeoJSON=geom;
+      
       document.getElementById(statusId).textContent=
         `Yüklendi: ${f.name} · ${geom.polygons.length} poligon`;
 
