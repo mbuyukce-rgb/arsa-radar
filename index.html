@@ -3,321 +3,1960 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Arsa Radar V5 — Parsel, Plan ve Kesişim Analizi</title>
-<style>
-:root{--navy:#0b1220;--navy2:#17243a;--bg:#eef2f6;--card:#fff;--muted:#64748b;--line:#dbe2ea;--green:#15803d;--yellow:#a16207;--red:#b91c1c;--blue:#075985;--purple:#6d28d9}
-*{box-sizing:border-box}body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:var(--bg);color:#152033}
-.hero{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:44px 20px}.wrap{max-width:1180px;margin:auto}
-h1{font-size:42px;margin:0 0 8px}h2{font-size:27px;margin:0 0 16px}h3{margin:0 0 8px}p{line-height:1.55}.muted{color:var(--muted)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;margin:20px 0;box-shadow:0 3px 15px rgba(15,23,42,.04)}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}label{font-weight:750;display:block;margin-bottom:6px}
-input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit}
-button,.btn{display:inline-block;padding:12px 16px;border:0;border-radius:10px;background:var(--navy);color:#fff;font-weight:800;cursor:pointer;text-decoration:none}
-.btn.secondary{background:#fff;color:var(--navy);border:1px solid #cbd5e1}.btn.blue{background:var(--blue)}.btn.green{background:var(--green)}.btn.purple{background:var(--purple)}
-.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.stat{background:#f5f7fa;padding:16px;border-radius:12px;border:1px solid #e5e7eb}.stat span{display:block;color:var(--muted);font-weight:700}.stat b{display:block;font-size:27px;margin-top:5px}
-table{width:100%;border-collapse:collapse;min-width:920px}th,td{text-align:left;padding:12px;border-bottom:1px solid #e5e7eb;vertical-align:top}th{background:#f8fafc}
-.badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}.badge.green{background:#dcfce7;color:#166534}.badge.yellow{background:#fef3c7;color:#92400e}.badge.red{background:#fee2e2;color:#991b1b}.badge.blue{background:#dbeafe;color:#1d4ed8}.badge.purple{background:#ede9fe;color:#5b21b6}
-.focus{border:2px solid #0f172a;background:#f8fafc}.checks{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.check{border:1px solid var(--line);border-radius:12px;padding:15px;background:#fff}.check strong{display:block;margin-bottom:5px}
-.notice{padding:14px 16px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12}.info{padding:14px 16px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a}
-.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.small{font-size:13px}.source-list{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.source{border:1px solid var(--line);border-radius:12px;padding:15px}.source a{font-weight:800;color:var(--blue)}
-footer{padding:30px 20px;color:var(--muted);text-align:center}
-@media(max-width:850px){.grid,.stats,.source-list{grid-template-columns:1fr 1fr}.checks{grid-template-columns:1fr}}
-@media(max-width:520px){.grid,.stats,.source-list{grid-template-columns:1fr}h1{font-size:34px}.card{padding:18px}}
+<title>Arsa Radar V6 — Parsel, Plan ve Fırsat Analizi</title>
 
-.geo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.geo-box{border:1px solid var(--line);border-radius:14px;padding:16px;background:#f8fafc}
-.geo-result{border:2px solid var(--line);border-radius:14px;padding:18px;background:#fff;margin-top:16px}
-.geo-result.verified{border-color:#86efac;background:#f0fdf4}
-.geo-result.open{border-color:#fcd34d;background:#fffbeb}
-.geo-result.no{border-color:#fca5a5;background:#fef2f2}
-.file-input{width:100%;padding:10px;border:1px dashed #94a3b8;border-radius:10px;background:#fff}
-code.k{background:#eef2ff;padding:2px 6px;border-radius:6px}
-@media(max-width:850px){.geo-grid{grid-template-columns:1fr}}
+<style>
+:root{
+  --navy:#0b1220;
+  --navy2:#17243a;
+  --bg:#eef2f6;
+  --card:#fff;
+  --muted:#64748b;
+  --line:#dbe2ea;
+  --green:#15803d;
+  --green2:#dcfce7;
+  --yellow:#a16207;
+  --yellow2:#fef3c7;
+  --red:#b91c1c;
+  --red2:#fee2e2;
+  --blue:#075985;
+  --blue2:#e0f2fe;
+  --orange:#c2410c;
+  --orange2:#ffedd5;
+  --shadow:0 12px 30px rgba(15,23,42,.08);
+}
+
+*{box-sizing:border-box}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:#172033;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+
+a{
+  color:var(--blue);
+  font-weight:700;
+}
+
+.wrap{
+  max-width:1220px;
+  margin:auto;
+  padding:0 20px 60px;
+}
+
+.hero{
+  margin:0 -20px 24px;
+  padding:42px 20px 34px;
+  color:white;
+  background:linear-gradient(135deg,var(--navy),var(--navy2));
+}
+
+.hero-inner{
+  max-width:1220px;
+  margin:auto;
+}
+
+.eyebrow{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+h1{
+  font-size:42px;
+  line-height:1.08;
+  margin:12px 0 10px;
+}
+
+h2{
+  font-size:28px;
+  margin:0 0 12px;
+}
+
+h3{
+  margin:0 0 8px;
+}
+
+.hero p{
+  max-width:850px;
+  margin:0;
+  color:#cbd5e1;
+  line-height:1.6;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:var(--shadow);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+
+.grid-2{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+
+.grid-3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+label{
+  display:block;
+  font-weight:750;
+  margin-bottom:6px;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  padding:12px;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  background:white;
+  font:inherit;
+  color:inherit;
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  outline:2px solid #bae6fd;
+  border-color:#0284c7;
+}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:12px 16px;
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
+  background:var(--navy);
+  color:white;
+}
+
+button:hover{
+  opacity:.92;
+}
+
+button.secondary{
+  background:white;
+  color:var(--navy);
+  border:1px solid #cbd5e1;
+}
+
+button.blue{
+  background:var(--blue);
+}
+
+button.green{
+  background:var(--green);
+}
+
+button.orange{
+  background:var(--orange);
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:16px;
+}
+
+.muted{
+  color:var(--muted);
+}
+
+.small{
+  font-size:13px;
+}
+
+.notice{
+  padding:14px 16px;
+  border-radius:12px;
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  color:#9a3412;
+  line-height:1.5;
+}
+
+.info{
+  padding:14px 16px;
+  border-radius:12px;
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  color:#1e40af;
+  line-height:1.5;
+}
+
+.success{
+  padding:14px 16px;
+  border-radius:12px;
+  background:var(--green2);
+  border:1px solid #86efac;
+  color:#166534;
+}
+
+.warning{
+  padding:14px 16px;
+  border-radius:12px;
+  background:var(--yellow2);
+  border:1px solid #fde68a;
+  color:#854d0e;
+}
+
+.danger{
+  padding:14px 16px;
+  border-radius:12px;
+  background:var(--red2);
+  border:1px solid #fecaca;
+  color:#991b1b;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.stat{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+  background:#f8fafc;
+}
+
+.stat .value{
+  font-size:27px;
+  font-weight:850;
+  margin-top:4px;
+}
+
+.stat .label{
+  color:var(--muted);
+  font-size:13px;
+}
+
+.badge{
+  display:inline-block;
+  padding:6px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.badge.green{
+  background:var(--green2);
+  color:#166534;
+}
+
+.badge.yellow{
+  background:var(--yellow2);
+  color:#854d0e;
+}
+
+.badge.red{
+  background:var(--red2);
+  color:#991b1b;
+}
+
+.badge.blue{
+  background:var(--blue2);
+  color:#075985;
+}
+
+.badge.gray{
+  background:#e2e8f0;
+  color:#475569;
+}
+
+.file-box{
+  border:1px dashed #94a3b8;
+  border-radius:12px;
+  padding:16px;
+  background:#f8fafc;
+}
+
+.file-box input{
+  padding:8px;
+  background:white;
+}
+
+.file-status{
+  margin-top:8px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.result{
+  margin-top:18px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  overflow:hidden;
+}
+
+.result-head{
+  padding:16px;
+  background:#f8fafc;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.result-body{
+  padding:18px;
+}
+
+.score{
+  font-size:54px;
+  line-height:1;
+  font-weight:900;
+}
+
+.score-label{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:5px;
+}
+
+.progress{
+  height:12px;
+  border-radius:999px;
+  background:#e2e8f0;
+  overflow:hidden;
+  margin-top:12px;
+}
+
+.progress span{
+  display:block;
+  height:100%;
+  width:0;
+  transition:width .4s ease;
+}
+
+.score-green{background:#16a34a}
+.score-yellow{background:#eab308}
+.score-red{background:#dc2626}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:720px;
+}
+
+th,td{
+  text-align:left;
+  padding:12px;
+  border-bottom:1px solid #e5e7eb;
+  vertical-align:top;
+}
+
+th{
+  background:#f8fafc;
+}
+
+.table-wrap{
+  overflow:auto;
+}
+
+.hidden{
+  display:none!important;
+}
+
+footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  padding:20px;
+}
+
+@media(max-width:900px){
+  .grid,
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .grid-2,
+  .grid-3{
+    grid-template-columns:1fr;
+  }
+
+  h1{
+    font-size:34px;
+  }
+}
+
+@media(max-width:560px){
+  .wrap{
+    padding:0 12px 40px;
+  }
+
+  .hero{
+    margin-left:-12px;
+    margin-right:-12px;
+  }
+
+  .grid,
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  .card{
+    padding:16px;
+  }
+
+  h1{
+    font-size:29px;
+  }
+}
 </style>
 </head>
+
 <body>
-<header class="hero"><div class="wrap">
-<h1>Arsa Radar</h1>
-<p>En ucuz parseli değil, <b>fiyatına göre fırsat + plan sinyali + doğrulama potansiyeli</b> en yüksek adayı bul.</p>
-<p style="color:#cbd5e1">V5 — fırsat taraması + plan sinyali + geometri + parsel/plan kesişim motoru</p>
-</div></header>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">Arsa Radar V6 · Web MVP</span>
+    <h1>Parseli bul. Planı kontrol et. Fırsatı ölç.</h1>
+    <p>
+      Parsel, plan ve imar sinyallerini tek ekranda toplayan;
+      geometri kesişimini gerçek dosyalar üzerinden kontrol eden
+      ücretsiz web MVP.
+    </p>
+  </div>
+</header>
+
 <main class="wrap">
+
 <section class="card">
-<h2>1. Fırsat Taraması</h2>
-<div class="grid">
-<div><label>İl</label><select id="il"></select></div>
-<div><label>İlçe</label><select id="ilce"></select></div>
-<div><label>Mahalle</label><input id="mah" placeholder="Örn. Ovayenice"></div>
-<div><label>Maks. bütçe (TL)</label><input id="butce" type="number" value="30000000"></div>
-<div><label>Maks. TL/m²</label><input id="m2max" type="number" value="5000"></div>
-<div><label>Min. alan (m²)</label><input id="amin" type="number" value="300"></div>
-<div><label>Max. alan (m²)</label><input id="amax" type="number" value="30000"></div>
-<div><label>Min. Radar skoru</label><input id="smin" type="number" value="0"></div>
-</div>
-<p style="margin-top:16px"><label style="display:inline"><input id="dog" type="checkbox" style="width:auto"> Yalnızca doğrulaması tamamlanmış parseller</label></p>
-<div class="actions"><button onclick="tara()">🔎 Fırsatları sırala</button><button class="btn secondary" onclick="resetForm()">↺ Varsayılanlara dön</button></div>
+  <h2>1. Parsel Kimliği</h2>
+  <p class="muted">
+    İncelediğin taşınmazın temel bilgilerini gir. Bu bilgiler tarayıcıda
+    saklanabilir ve rapora dahil edilir.
+  </p>
+
+  <div class="grid">
+    <div>
+      <label for="il">İl</label>
+      <input id="il" placeholder="İstanbul">
+    </div>
+
+    <div>
+      <label for="ilce">İlçe</label>
+      <input id="ilce" placeholder="Çatalca">
+    </div>
+
+    <div>
+      <label for="ada">Ada</label>
+      <input id="ada" placeholder="136351">
+    </div>
+
+    <div>
+      <label for="parsel">Parsel</label>
+      <input id="parsel" placeholder="134">
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:14px">
+    <div>
+      <label for="alan">Parsel Alanı (m²)</label>
+      <input id="alan" type="number" placeholder="1000">
+    </div>
+
+    <div>
+      <label for="fiyat">İstenen Fiyat (TL)</label>
+      <input id="fiyat" type="number" placeholder="2500000">
+    </div>
+
+    <div>
+      <label for="nitelik">Nitelik</label>
+      <select id="nitelik">
+        <option>Arsa</option>
+        <option>Tarla</option>
+        <option>Bahçe</option>
+        <option>Tarım Arazisi</option>
+        <option>Diğer</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="kaynak">Veri Kaynağı</label>
+      <select id="kaynak">
+        <option>TKGM / MEGSİS</option>
+        <option>Belediye</option>
+        <option>İBB</option>
+        <option>Kullanıcı girişi</option>
+        <option>Diğer</option>
+      </select>
+    </div>
+  </div>
 </section>
+
+
 <section class="card">
-<h2>2. Radar Özeti</h2>
-<div class="stats">
-<div class="stat"><span>Aday</span><b id="n">0</b></div>
-<div class="stat"><span>Ortalama Radar skoru</span><b id="avg">—</b></div>
-<div class="stat"><span>En düşük TL/m²</span><b id="low">—</b></div>
-<div class="stat"><span>Resmî plan sinyali</span><b id="planCount">0</b></div>
-</div>
+  <h2>2. Plan ve İmar Sinyalleri</h2>
+
+  <div class="grid-3">
+
+    <div>
+      <label for="planSinyali">Plan Sinyali</label>
+      <select id="planSinyali">
+        <option value="0">Yok / bilinmiyor</option>
+        <option value="10">Zayıf sinyal</option>
+        <option value="20">Plan değişikliği</option>
+        <option value="25">1/5000 plan sinyali</option>
+        <option value="30">1/1000 plan sinyali</option>
+        <option value="40">Güçlü plan sinyali</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="ulasan">Ulaşım / Yol</label>
+      <select id="ulasan">
+        <option value="0">Bilinmiyor</option>
+        <option value="5">Kısmen uygun</option>
+        <option value="10">Yola cepheli</option>
+        <option value="15">Ana ulaşım aksına yakın</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="cevre">Çevresel Gelişim</label>
+      <select id="cevre">
+        <option value="0">Bilinmiyor</option>
+        <option value="5">Düşük</option>
+        <option value="10">Orta</option>
+        <option value="15">Yüksek</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div style="margin-top:16px">
+    <label for="notlar">Analist Notları</label>
+    <textarea id="notlar"
+      placeholder="Plan kararı, belediye kararı, ulaşım, çevredeki gelişmeler veya dikkat edilmesi gereken hususlar..."></textarea>
+  </div>
 </section>
-<section class="card">
-<div class="toolbar"><h2 style="margin:0">3. Sonuçlar</h2><span class="small muted">Fırsat skoru ile hukuki/imar doğrulaması birbirinden ayrıdır.</span></div>
-<div style="overflow:auto;margin-top:18px"><table><thead><tr><th>Radar</th><th>Konum</th><th>Ada/Parsel</th><th>Alan</th><th>Fiyat</th><th>TL/m²</th><th>Plan sinyali</th><th>Doğrulama</th><th>Karar</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
-</section>
-<section class="card focus" id="ozel"><h2>4. Seçili Parsel</h2><div id="selected"></div></section>
-<section class="card"><h2>5. Resmî Plan İstihbaratı</h2><div id="planBox"></div></section>
-<section class="card"><h2>6. Doğrulama Motoru</h2><p class="muted">Bir parselde açık veya doğrulanmamış kritik kontrol varken sistem “satın al”, “kesin imarlı” veya “kesin değerlenecek” kararı üretmez.</p><div class="checks" id="checks"></div></section>
-<section class="card"><h2>7. Doğrulama Kayıtları</h2><div style="overflow:auto"><table><thead><tr><th>Kontrol</th><th>Durum</th><th>Kaynak</th><th>Not</th></tr></thead><tbody id="audit"></tbody></table></div></section>
-<section class="card">
-<h2>8. Kaynaklar</h2>
-<div class="source-list">
-<div class="source"><b>İBB Askı Plan</b><p class="small muted">Ovayenice 18. madde uygulama sınırı ve plan notuna ilişkin 1/5000 NİP değişikliği.</p><a href="https://planaski.ibb.gov.tr/?id=107451" target="_blank">Resmî kaydı aç →</a></div>
-<div class="source"><b>Çatalca Belediyesi</b><p class="small muted">09.01.2026 tarihli meclis kararı: Ovayenice 18. madde sınırına ait 1/1000 ölçekli plan değişikliği.</p><a href="https://catalca.bel.tr/belgeler/meclis-kararlari" target="_blank">Meclis kararları →</a></div>
-<div class="source"><b>TKGM Parsel Sorgu</b><p class="small muted">Ada/parsel, yüzölçümü ve geometrinin resmî kaynaktan kontrol edilmesi için.</p><a href="https://parselsorgu.tkgm.gov.tr/" target="_blank">Parsel Sorgu →</a></div>
-</div>
-</section>
+
 
 <section class="card" id="geometry">
-<h2>9. Parsel ↔ Plan Kesişim Motoru</h2>
-<p>Bu bölüm V5'in kritik farkıdır. Sistem artık “plan sinyali var” ile “bu parsel plan geometrisiyle kesişiyor” durumunu ayrı tutar.</p>
-<div class="notice"><b>Önemli:</b> 134/11 için bu sürümde gerçek parsel ve plan GeoJSON geometrisi yüklenmediği sürece sistem kesişim sonucu üretmez. Eksik geometri “kesişiyor” kabul edilmez.</div>
-<div class="geo-grid" style="margin-top:14px">
-  <div class="geo-box">
-    <h3>Parsel geometrisi</h3>
-    <p class="small muted">TKGM/MEGSİS veya GeoJSON kaynağından parsel poligonu.</p>
-    <input class="file-input" id="parcelGeo" type="file" accept=".kml,.geojson,.json,application/vnd.google-earth.kml+xml,application/geo+json">
-    <p class="small" id="parcelFileStatus">Dosya yüklenmedi.</p>
+
+  <h2>3. Parsel ↔ Plan Kesişim Motoru</h2>
+
+  <p>
+    Sistem artık yalnızca "plan sinyali var" demek yerine,
+    yüklenen gerçek geometrilerin birbirleriyle kesişip kesişmediğini
+    kontrol eder.
+  </p>
+
+  <div class="notice">
+    <b>Önemli:</b>
+    Gerçek parsel ve plan GeoJSON/KML geometrileri yüklenmeden
+    geometrik kesişim sonucu üretilmez.
   </div>
-  <div class="geo-box">
-    <h3>Plan geometrisi</h3>
-    <p class="small muted">Plan/askı paftasından çıkarılmış GeoJSON poligonu.</p>
-    <input class="file-input" id="planGeo" type="file" accept=".geojson,.json,application/geo+json">
-    <p class="small" id="planFileStatus">Dosya yüklenmedi.</p>
+
+  <div class="grid-2" style="margin-top:16px">
+
+    <div class="file-box">
+      <h3>Parsel geometrisi</h3>
+
+      <p class="small muted">
+        TKGM / MEGSİS veya GeoJSON/KML kaynağından parsel poligonu.
+      </p>
+
+      <input
+        id="parcelGeo"
+        type="file"
+        accept=".geojson,.json,.kml,.xml,application/geo+json,application/vnd.google-earth.kml+xml"
+      >
+
+      <div id="parcelFileStatus" class="file-status">
+        Dosya yüklenmedi.
+      </div>
+    </div>
+
+    <div class="file-box">
+      <h3>Plan geometrisi</h3>
+
+      <p class="small muted">
+        Plan/askı paftasından çıkarılmış GeoJSON/KML poligonu.
+      </p>
+
+      <input
+        id="planGeo"
+        type="file"
+        accept=".geojson,.json,.kml,.xml,application/geo+json,application/vnd.google-earth.kml+xml"
+      >
+
+      <div id="planFileStatus" class="file-status">
+        Dosya yüklenmedi.
+      </div>
+    </div>
+
   </div>
-</div>
-<div class="actions">
-  <button onclick="calculateIntersection()">◎ Kesişimi hesapla</button>
-  <button class="btn secondary" onclick="clearGeometry()">Temizle</button>
-</div>
-<div id="geoResult" class="geo-result open">
-  <b>MEVCUT DURUM: GEOMETRİ BEKLENİYOR</b>
-  <p>Parsel ve plan poligonu yüklenmeden mekânsal kesişim doğrulanamaz.</p>
-</div>
-<div class="info" style="margin-top:14px">
-  <b>Hesap mantığı:</b> GeoJSON içindeki Polygon/MultiPolygon geometrileri okunur; köşe-içinde, kenar-kesişimi ve çoklu geometri kontrolleri yapılır. Sonuç “kesişiyor / kesişmiyor / hesaplanamadı” olarak kaydedilir.
-</div>
+
+  <div class="actions">
+    <button onclick="calculateIntersection()">
+      ◎ Kesişimi Hesapla
+    </button>
+
+    <button class="secondary" onclick="clearGeometry()">
+      Temizle
+    </button>
+  </div>
+
+  <div id="geoResult" class="result">
+    <div class="result-head">
+      <b>MEVCUT DURUM</b>
+      <span class="badge gray">Geometri bekleniyor</span>
+    </div>
+
+    <div class="result-body muted">
+      Parsel ve plan geometrisi yüklenmeden mekansal kesişim doğrulanamaz.
+    </div>
+  </div>
+
 </section>
 
-<section class="card"><h2>10. Veri Modeli</h2><p>Her aday aynı yapıdadır: <b>konum + ada/parsel + alan + fiyat + kaynak + fırsat skoru + plan sinyali + doğrulama kontrolleri + son kontrol tarihi</b>.</p><div class="notice">Canlı TKGM/MEGSİS veya belediye API'si bu statik V4'e bağlı değildir. Resmî plan kaydı bulunması, tek başına belirli bir parselin plan sınırı içinde olduğunu kanıtlamaz.</div><div class="actions"><button class="btn secondary" onclick="exportData()">⬇ JSON dışa aktar</button></div></section>
-<section class="card"><h2>11. Sistem Durumu</h2><p><b>V5'te çalışan:</b> V4 özelliklerine ek olarak GeoJSON Polygon/MultiPolygon yükleme, parsel-plan geometrisi kesişim hesabı ve kesişim durumunun veri modeline yazılması.</p><p><b>Sıradaki teknik eşik:</b> TKGM/MEGSİS ve resmî plan katmanlarından aynı koordinat referans sisteminde otomatik geometri çekimi.</p></section>
+
+<section class="card">
+
+  <h2>4. Fırsat Motoru</h2>
+
+  <p class="muted">
+    Bu skor yatırım kararı değildir. Girilen sinyalleri aynı çerçevede
+    değerlendirmek için kullanılan ön eleme skorudur.
+  </p>
+
+  <div class="stats">
+
+    <div class="stat">
+      <div class="label">Plan Sinyali</div>
+      <div class="value" id="statPlan">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="label">Geometri</div>
+      <div class="value" id="statGeo">—</div>
+    </div>
+
+    <div class="stat">
+      <div class="label">Ulaşım</div>
+      <div class="value" id="statRoad">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="label">Çevre</div>
+      <div class="value" id="statEnv">0</div>
+    </div>
+
+  </div>
+
+  <div class="result" style="margin-top:18px">
+
+    <div class="result-body">
+
+      <div class="grid-2">
+
+        <div>
+          <div class="muted small">ÖN ELEME SKORU</div>
+          <div id="scoreValue" class="score">0</div>
+          <div id="scoreLabel" class="score-label">
+            Henüz analiz yapılmadı.
+          </div>
+
+          <div class="progress">
+            <span id="scoreProgress"></span>
+          </div>
+        </div>
+
+        <div>
+          <h3>Radar yorumu</h3>
+          <div id="radarComment" class="info">
+            Parsel bilgilerini girip analizi çalıştır.
+          </div>
+        </div>
+
+      </div>
+
+      <div class="actions">
+        <button class="green" onclick="runRadar()">
+          ⚡ Radar Analizini Çalıştır
+        </button>
+
+        <button class="secondary" onclick="saveAnalysis()">
+          Kaydet
+        </button>
+
+        <button class="blue" onclick="exportReport()">
+          JSON Raporu İndir
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section class="card">
+
+  <h2>5. Karar Özeti</h2>
+
+  <div id="decisionBox" class="warning">
+    Henüz karar üretilemedi.
+  </div>
+
+  <div class="table-wrap" style="margin-top:16px">
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>Kriter</th>
+          <th>Durum</th>
+          <th>Etki</th>
+          <th>Açıklama</th>
+        </tr>
+      </thead>
+
+      <tbody id="decisionTable">
+
+        <tr>
+          <td>Plan</td>
+          <td>Bekliyor</td>
+          <td>—</td>
+          <td>Plan sinyali seçilmedi.</td>
+        </tr>
+
+        <tr>
+          <td>Geometri</td>
+          <td>Bekliyor</td>
+          <td>—</td>
+          <td>Parsel ve plan geometrileri yüklenmedi.</td>
+        </tr>
+
+        <tr>
+          <td>Ulaşım</td>
+          <td>Bekliyor</td>
+          <td>—</td>
+          <td>Ulaşım durumu seçilmedi.</td>
+        </tr>
+
+        <tr>
+          <td>Çevre</td>
+          <td>Bekliyor</td>
+          <td>—</td>
+          <td>Çevresel gelişim seçilmedi.</td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+
+<section class="card">
+
+  <h2>6. Resmî Kaynaklar</h2>
+
+  <div class="grid-3">
+
+    <div class="file-box">
+      <h3>TKGM Parsel Sorgu</h3>
+      <p class="small muted">
+        Ada/parsel, yüzölçümü ve temel parsel bilgisinin resmî kaynaktan
+        kontrol edilmesi.
+      </p>
+
+      <a
+        href="https://parselsorgu.tkgm.gov.tr/"
+        target="_blank"
+        rel="noopener">
+        Parsel Sorgu →
+      </a>
+    </div>
+
+    <div class="file-box">
+      <h3>İBB Askı Planları</h3>
+      <p class="small muted">
+        İstanbul'daki plan değişiklikleri ve askı süreçlerinin kontrolü.
+      </p>
+
+      <a
+        href="https://application2.ibb.gov.tr/askiplan/"
+        target="_blank"
+        rel="noopener">
+        Resmî kaynağı aç →
+      </a>
+    </div>
+
+    <div class="file-box">
+      <h3>Çatalca Belediyesi</h3>
+      <p class="small muted">
+        Belediye meclis kararları ve plan süreçleri için resmî belediye
+        kaynağı.
+      </p>
+
+      <a
+        href="https://www.catalca.bel.tr/"
+        target="_blank"
+        rel="noopener">
+        Belediye →
+      </a>
+    </div>
+
+  </div>
+
+</section>
+
 </main>
-<footer>Arsa Radar V4 — ön eleme ve doğrulama yardımcısı. Nihai yatırım/mülkiyet kararı için resmî kayıtlar esas alınmalıdır.</footer>
+
+<footer>
+  Arsa Radar V6 · Ücretsiz Web MVP · Sonuçlar ön analiz niteliğindedir.
+</footer>
+
+
 <script>
-const PLAN_ISTIH={status:"RESMI_PLAN_KAYDI_BULUNDU",title:"ÇATALCA İLÇESİ OVAYENİCE MAH 18 MADDE UYGULAMA SINIRI VE PLAN NOTUNA İLİŞKİN NİP DEĞ (1/5000)",type:"Tadilat",approval:"25.04.2026",decision:"371/4/16/2026",announce:"22.06.2026",remove:"21.07.2026",description:"Çatalca İlçesi, Ovayenice Mahallesi, 18. Madde İmar Uygulama Sınırının İptali ve plan notu tadilatına ilişkin değişiklik.",url:"https://planaski.ibb.gov.tr/?id=107451",scope:"MAHALLE DÜZEYİNDE KAYIT; 134/11 PARSEL KESİŞİMİ HENÜZ DOĞRULANMADI"};
-function blankControls(note){return{kadastro:{status:"unverified",source:"TKGM",note},geometri:{status:"unverified",source:"TKGM/MEGSİS",note},imar:{status:"unverified",source:"İBB / Çatalca Belediyesi",note},yol:{status:"unverified",source:"Kadastro/harita",note},terk18:{status:"unverified",source:"Resmî plan/kadastro",note},kisit:{status:"unverified",source:"Resmî kurum katmanları",note}}}
-const PARSELLER=[
-{id:"istanbul-catalca-ovayenice-134-11",il:"İstanbul",ilce:"Çatalca",mah:"Ovayenice",ada:"134",parsel:"11",alan:9065.32,fiyat:22000000,radar:76,planSignal:true,geometryStatus:"pending",intersectionStatus:"not_calculated",parcelGeometrySource:"TKGM/MEGSİS",planGeometrySource:"İBB plan paftası",source:"İlan + TKGM ekran kontrolü",checked:"2026-08-25",verified:false,controls:{kadastro:{status:"verified",source:"TKGM Parsel Sorgu",note:"134 ada / 11 parsel görüldü; alan 9.065,32 m² ve nitelik Tarla."},geometri:{status:"verified",source:"TKGM harita görüntüsü",note:"Parsel geometrisi görüntülendi; plan sınırı ile kesişim henüz hesaplanmadı."},imar:{status:"open",source:"İBB Plan Askı / Çatalca Belediyesi",note:"Ovayenice için resmî plan değişikliği kaydı bulundu; 134/11'in plan sınırı içindeki konumu ayrıca doğrulanmalı."},yol:{status:"open",source:"TKGM + kadastro yolu kontrolü",note:"Haritada yol bağlantısı görülüyor; hukuki/fiilî erişim ayrıca doğrulanmalı."},terk18:{status:"unverified",source:"Resmî plan / kadastro belgeleri",note:"18. madde ve terk durumu parsel bazında resmî belge ile doğrulanmalı."},kisit:{status:"open",source:"Resmî kurum ve harita katmanları",note:"Tarım, orman, sit, dere, enerji hattı ve diğer kısıtlar otomatik doğrulanmış değil."}}},
-{id:"istanbul-catalca-ovayenice-190-58",il:"İstanbul",ilce:"Çatalca",mah:"Ovayenice",ada:"190",parsel:"58",alan:5042,fiyat:13400000,radar:65,planSignal:false,source:"İlan verisi",checked:"2026-08-25",verified:true,controls:blankControls("Ön doğrulama kaydı; resmî kaynak dosyaları bu sürümde saklanmıyor.")},
-{id:"istanbul-catalca-ovayenice-9726",il:"İstanbul",ilce:"Çatalca",mah:"Ovayenice",ada:"—",parsel:"—",alan:9726,fiyat:20500000,radar:70,planSignal:false,source:"İlan verisi",checked:"2026-08-25",verified:false,controls:blankControls("Resmî parsel ve plan doğrulaması yapılmadı.")},
-{id:"istanbul-catalca-ovayenice-4358",il:"İstanbul",ilce:"Çatalca",mah:"Ovayenice",ada:"—",parsel:"—",alan:4358,fiyat:16250000,radar:55,planSignal:false,source:"İlan verisi",checked:"2026-08-25",verified:false,controls:blankControls("Resmî parsel ve plan doğrulaması yapılmadı.")},
-{id:"istanbul-catalca-ovayenice-7531",il:"İstanbul",ilce:"Çatalca",mah:"Ovayenice",ada:"—",parsel:"—",alan:7531,fiyat:35000000,radar:48,planSignal:false,source:"İlan verisi",checked:"2026-08-25",verified:false,controls:blankControls("Resmî parsel ve plan doğrulaması yapılmadı.")},
-{id:"istanbul-catalca-ovayenice-1052",il:"İstanbul",ilce:"Çatalca",mah:"Ovayenice",ada:"—",parsel:"—",alan:1052,fiyat:4900000,radar:45,planSignal:false,source:"İlan verisi",checked:"2026-08-25",verified:false,controls:blankControls("Resmî parsel ve plan doğrulaması yapılmadı.")},
-{id:"istanbul-catalca-ovayenice-1487",il:"İstanbul",ilce:"Çatalca",mah:"Ovayenice",ada:"—",parsel:"—",alan:1487,fiyat:7500000,radar:40,planSignal:false,source:"İlan verisi",checked:"2026-08-25",verified:false,controls:blankControls("Resmî parsel ve plan doğrulaması yapılmadı.")},
-{id:"istanbul-catalca-ovayenice-515",il:"İstanbul",ilce:"Çatalca",mah:"Ovayenice",ada:"—",parsel:"—",alan:515,fiyat:1800000,radar:50,planSignal:false,source:"İlan verisi",checked:"2026-08-25",verified:false,controls:blankControls("Resmî parsel ve plan doğrulaması yapılmadı.")}
-];
-PARSELLER.forEach(p=>{if(!p.geometryStatus)p.geometryStatus="missing";if(!p.intersectionStatus)p.intersectionStatus="not_calculated";});
-const names={kadastro:"Kadastro / parsel",geometri:"Parsel geometrisi",imar:"İmar / plan",yol:"Yol / ulaşım",terk18:"18. madde / terk",kisit:"Tarım / orman / sit / diğer kısıtlar"};
-function money(n){return new Intl.NumberFormat("tr-TR").format(Math.round(n))+" TL"}function area(n){return new Intl.NumberFormat("tr-TR",{maximumFractionDigits:2}).format(n)+" m²"}function m2(p){return p.fiyat/p.alan}function statusText(s){return s==="verified"?"DOĞRULANDI":s==="open"?"AÇIK":"DOĞRULANMADI"}function badge(s){let c=s==="verified"?"green":s==="open"?"yellow":"red";return `<span class="badge ${c}">${statusText(s)}</span>`}
-function decision(p){const unresolved=["kadastro","geometri","imar","yol","terk18","kisit"].some(k=>p.controls[k].status!=="verified");if(!unresolved)return `<span class="badge green">İLERİ İNCELEME</span>`;if(p.planSignal&&p.radar>=70)return `<span class="badge purple">GÜÇLÜ ADAY / DOĞRULAMA</span>`;if(p.radar>=70)return `<span class="badge blue">GÜÇLÜ ADAY</span>`;return `<span class="badge yellow">ÖN İNCELEME</span>`}
-function fillSelects(){const ils=[...new Set(PARSELLER.map(p=>p.il))],il=document.getElementById("il");il.innerHTML='<option value="">Hepsi</option>'+ils.map(x=>`<option>${x}</option>`).join("");il.onchange=()=>{const v=il.value,arr=[...new Set(PARSELLER.filter(p=>!v||p.il===v).map(p=>p.ilce))];document.getElementById("ilce").innerHTML='<option value="">Hepsi</option>'+arr.map(x=>`<option>${x}</option>`).join("")};document.getElementById("ilce").innerHTML='<option value="">Hepsi</option>'+[...new Set(PARSELLER.map(p=>p.ilce))].map(x=>`<option>${x}</option>`).join("")}
-function tara(){const il=document.getElementById("il").value,ilce=document.getElementById("ilce").value,mah=document.getElementById("mah").value.trim().toLocaleLowerCase("tr-TR"),butce=Number(document.getElementById("butce").value)||Infinity,mx=Number(document.getElementById("m2max").value)||Infinity,amin=Number(document.getElementById("amin").value)||0,amax=Number(document.getElementById("amax").value)||Infinity,smin=Number(document.getElementById("smin").value)||0,dog=document.getElementById("dog").checked;const arr=PARSELLER.filter(p=>(!il||p.il===il)&&(!ilce||p.ilce===ilce)&&(!mah||p.mah.toLocaleLowerCase("tr-TR").includes(mah))&&p.fiyat<=butce&&m2(p)<=mx&&p.alan>=amin&&p.alan<=amax&&p.radar>=smin&&(!dog||p.verified)).sort((a,b)=>b.radar-a.radar||m2(a)-m2(b));document.getElementById("n").textContent=arr.length;document.getElementById("avg").textContent=arr.length?Math.round(arr.reduce((s,p)=>s+p.radar,0)/arr.length):"—";document.getElementById("low").textContent=arr.length?money(Math.min(...arr.map(m2))):"—";document.getElementById("planCount").textContent=arr.filter(p=>p.planSignal).length;document.getElementById("rows").innerHTML=arr.map(p=>`<tr><td><b>${p.radar}/100</b></td><td>${p.il} → ${p.ilce} → ${p.mah}</td><td>${p.ada}/${p.parsel}</td><td>${area(p.alan)}</td><td>${money(p.fiyat)}</td><td>${money(m2(p))}</td><td>${p.planSignal?'<span class="badge purple">RESMÎ SİNYAL</span>':'<span class="badge blue">YOK</span>'}</td><td>${p.verified?'<span class="badge green">TAMAM</span>':'<span class="badge yellow">AÇIK</span>'}</td><td>${decision(p)}</td><td><button onclick="sec('${p.id}')">İncele</button></td></tr>`).join("")||'<tr><td colspan="10">Filtreye uygun aday bulunamadı.</td></tr>';if(arr.length)sec(arr[0].id)}
-function sec(id){const p=PARSELLER.find(x=>x.id===id);if(!p)return;document.getElementById("selected").innerHTML=`<div class="stats"><div class="stat"><span>Konum</span><b style="font-size:20px">${p.ilce} / ${p.mah}</b></div><div class="stat"><span>Ada / Parsel</span><b>${p.ada}/${p.parsel}</b></div><div class="stat"><span>Alan</span><b style="font-size:20px">${area(p.alan)}</b></div><div class="stat"><span>İlan TL/m²</span><b style="font-size:20px">${money(m2(p))}</b></div></div><p><b>Radar:</b> ${p.radar}/100 &nbsp; <b>Kaynak:</b> ${p.source} &nbsp; <b>Son kontrol:</b> ${p.checked}</p>
-<div class="info"><b>Geometri durumu:</b> ${p.geometryStatus==="verified"?"DOĞRULANDI":p.geometryStatus==="pending"?"BEKLENİYOR":"EKSİK"} · <b>Kesişim:</b> ${p.intersectionStatus==="intersects"?"KESİŞİYOR":p.intersectionStatus==="disjoint"?"KESİŞMİYOR":"HESAPLANMADI"}</div>
-${p.planSignal?'<div class="info"><b>Plan sinyali:</b> Ovayenice için resmî 1/5000 plan değişikliği kaydı bulundu. Bu kayıt 134/11 ile mekânsal kesişimi tek başına kanıtlamaz.</div>':''}`;document.getElementById("checks").innerHTML=Object.entries(p.controls).map(([k,v])=>`<div class="check"><strong>${names[k]}</strong>${badge(v.status)}<p class="small">${v.note}</p><div class="small muted">Kaynak: ${v.source}</div></div>`).join("");document.getElementById("audit").innerHTML=Object.entries(p.controls).map(([k,v])=>`<tr><td>${names[k]}</td><td>${badge(v.status)}</td><td>${v.source}</td><td>${v.note}</td></tr>`).join("");renderPlan();document.getElementById("ozel").scrollIntoView({behavior:"smooth",block:"start"})}
-function renderPlan(){document.getElementById("planBox").innerHTML=`<div class="info"><b>${PLAN_ISTIH.status}</b><p><b>${PLAN_ISTIH.title}</b></p><p>Plan türü: ${PLAN_ISTIH.type} · Onay: ${PLAN_ISTIH.approval} · Meclis: ${PLAN_ISTIH.decision}<br>İlan: ${PLAN_ISTIH.announce} · İniş: ${PLAN_ISTIH.remove}</p><p>${PLAN_ISTIH.description}</p><p><b>Parsel kapsamı:</b> ${PLAN_ISTIH.scope}</p><a class="btn blue" href="${PLAN_ISTIH.url}" target="_blank">İBB resmî kaydını aç →</a></div>`}
 
-let parcelGeoJSON=null, planGeoJSON=null;
+let parcelGeometry = null;
+let planGeometry = null;
+let intersectionState = {
+  checked:false,
+  intersects:false,
+  parcelCount:0,
+  planCount:0
+};
 
-function readGeoFile(inputId,statusId,target){
-  const f=document.getElementById(inputId).files[0];
-  if(!f)return;
 
-  const r=new FileReader();
+/* =========================================================
+   TEMEL YARDIMCILAR
+========================================================= */
 
-  r.onload=()=>{
-    try{
-      let g;
+function $(id){
+  return document.getElementById(id);
+}
 
-      if(f.name.toLowerCase().endsWith(".kml")){
-        const xml=new DOMParser().parseFromString(r.result,"text/xml");
+function setText(id,value){
+  $(id).textContent = value;
+}
 
-        if(xml.querySelector("parsererror")){
-          throw new Error("KML dosyası okunamadı");
-        }
+function escapeHtml(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
 
-        const polygons=[...xml.querySelectorAll("Polygon")].map(poly=>{
-          const rings=[...poly.querySelectorAll(":scope > outerBoundaryIs LinearRing, :scope > innerBoundaryIs LinearRing")]
-            .map(ring=>{
-              const text=ring.querySelector("coordinates")?.textContent||"";
-              return text.trim().split(/\s+/).map(c=>{
-                const p=c.split(",").map(Number);
-                return [p[0],p[1]];
-              }).filter(p=>Number.isFinite(p[0])&&Number.isFinite(p[1]));
-            })
-            .filter(ring=>ring.length>=3);
 
-          if(!rings.length)return null;
+/* =========================================================
+   GEOJSON / KML OKUMA
+========================================================= */
 
-          return {
-            type:"Feature",
-            properties:{},
-            geometry:{
-              type:"Polygon",
-              coordinates:rings
-            }
-          };
-        }).filter(Boolean);
+function geometryToPolygons(geometry){
 
-        if(!polygons.length){
-          throw new Error("KML içinde Polygon geometrisi bulunamadı");
-        }
+  if(!geometry) return [];
 
-        g={
-          type:"FeatureCollection",
-          features:polygons
-        };
+  const type = geometry.type;
+  const c = geometry.coordinates;
 
-      }else{
-        g=JSON.parse(r.result);
-      }
+  if(type === "Polygon"){
+    return [c];
+  }
 
-      const geom=normalizeGeoJSON(g);
+  if(type === "MultiPolygon"){
+    return c;
+  }
 
-      if(!geom){
-        throw new Error("Polygon/MultiPolygon bulunamadı");
-      }
+  if(type === "GeometryCollection"){
+    return (geometry.geometries || [])
+      .flatMap(g => geometryToPolygons(g));
+  }
 
-    if(target==="parcelGeoJSON") parcelGeoJSON=geom;
-else if(target==="planGeoJSON") planGeoJSON=geom;
-      
-      document.getElementById(statusId).textContent=
-        `Yüklendi: ${f.name} · ${geom.polygons.length} poligon`;
+  return [];
+}
 
-    }catch(e){
-      window[target]=null;
-      document.getElementById(statusId).textContent="Hata: "+e.message;
+
+function extractPolygonsFromGeoJSON(data){
+
+  let polygons = [];
+
+  if(!data) return [];
+
+  if(data.type === "Feature"){
+    polygons = geometryToPolygons(data.geometry);
+  }
+
+  else if(data.type === "FeatureCollection"){
+    for(const feature of data.features || []){
+      polygons.push(...geometryToPolygons(feature.geometry));
     }
-  };
-
-  r.readAsText(f);
-}
-document.getElementById("parcelGeo").addEventListener("change",()=>readGeoFile("parcelGeo","parcelFileStatus","parcelGeoJSON"));
-document.getElementById("planGeo").addEventListener("change",()=>readGeoFile("planGeo","planFileStatus","planGeoJSON"));
-
-function normalizeGeoJSON(g){
-  let polygons=[];
-  function addGeometry(geom){
-    if(!geom)return;
-    if(geom.type==="Polygon") polygons.push(geom.coordinates);
-    else if(geom.type==="MultiPolygon") polygons.push(...geom.coordinates);
-    else if(geom.type==="GeometryCollection") geom.geometries.forEach(addGeometry);
   }
-  if(g.type==="FeatureCollection") g.features.forEach(f=>addGeometry(f.geometry));
-  else if(g.type==="Feature") addGeometry(g.geometry);
-  else addGeometry(g);
-  if(!polygons.length)return null;
-  return {polygons};
-}
-function ringPointInside(pt,ring){
-  let inside=false;
-  for(let i=0,j=ring.length-1;i<ring.length;j=i++){
-    const xi=ring[i][0],yi=ring[i][1],xj=ring[j][0],yj=ring[j][1];
-    const hit=((yi>pt[1])!==(yj>pt[1])) && (pt[0] < (xj-xi)*(pt[1]-yi)/(yj-yi+Number.EPSILON)+xi);
-    if(hit)inside=!inside;
+
+  else if(data.type === "Feature"){
+    polygons = geometryToPolygons(data.geometry);
   }
+
+  else if(
+    data.type === "Polygon" ||
+    data.type === "MultiPolygon"
+  ){
+    polygons = geometryToPolygons(data);
+  }
+
+  return polygons;
+}
+
+
+function extractPolygonsFromKML(text){
+
+  const parser = new DOMParser();
+
+  const xml = parser.parseFromString(
+    text,
+    "application/xml"
+  );
+
+  const parseError = xml.querySelector("parsererror");
+
+  if(parseError){
+    throw new Error("KML okunamadı.");
+  }
+
+  const placemarks = [
+    ...xml.querySelectorAll("Placemark")
+  ];
+
+  const polygons = [];
+
+  for(const placemark of placemarks){
+
+    const coordsNodes = [
+      ...placemark.querySelectorAll(
+        "Polygon coordinates, LinearRing coordinates"
+      )
+    ];
+
+    for(const node of coordsNodes){
+
+      const raw = node.textContent.trim();
+
+      const points = raw
+        .split(/\s+/)
+        .map(pair => {
+
+          const p = pair.split(",");
+
+          return [
+            Number(p[0]),
+            Number(p[1])
+          ];
+
+        })
+        .filter(p =>
+          Number.isFinite(p[0]) &&
+          Number.isFinite(p[1])
+        );
+
+      if(points.length >= 3){
+        polygons.push([points]);
+      }
+    }
+  }
+
+  return polygons;
+}
+
+
+async function readGeometryFile(file){
+
+  const text = await file.text();
+
+  const lower = file.name.toLowerCase();
+
+  if(
+    lower.endsWith(".kml") ||
+    lower.endsWith(".xml")
+  ){
+    return extractPolygonsFromKML(text);
+  }
+
+  const json = JSON.parse(text);
+
+  return extractPolygonsFromGeoJSON(json);
+}
+
+
+/* =========================================================
+   DOSYA YÜKLEME
+========================================================= */
+
+$("parcelGeo").addEventListener(
+  "change",
+  async function(){
+
+    const file = this.files[0];
+
+    if(!file) return;
+
+    try{
+
+      const polygons = await readGeometryFile(file);
+
+      if(!polygons.length){
+        throw new Error(
+          "Dosyada desteklenen Polygon geometrisi bulunamadı."
+        );
+      }
+
+      parcelGeometry = polygons;
+
+      setText(
+        "parcelFileStatus",
+        `${file.name} · ${polygons.length} poligon yüklendi.`
+      );
+
+      intersectionState.checked = false;
+
+      updateGeometryBadge();
+
+    }catch(error){
+
+      parcelGeometry = null;
+
+      setText(
+        "parcelFileStatus",
+        "HATA: " + error.message
+      );
+
+    }
+  }
+);
+
+
+$("planGeo").addEventListener(
+  "change",
+  async function(){
+
+    const file = this.files[0];
+
+    if(!file) return;
+
+    try{
+
+      const polygons = await readGeometryFile(file);
+
+      if(!polygons.length){
+        throw new Error(
+          "Dosyada desteklenen Polygon geometrisi bulunamadı."
+        );
+      }
+
+      planGeometry = polygons;
+
+      setText(
+        "planFileStatus",
+        `${file.name} · ${polygons.length} poligon yüklendi.`
+      );
+
+      intersectionState.checked = false;
+
+      updateGeometryBadge();
+
+    }catch(error){
+
+      planGeometry = null;
+
+      setText(
+        "planFileStatus",
+        "HATA: " + error.message
+      );
+
+    }
+  }
+);
+
+
+/* =========================================================
+   GEOMETRİ HESAPLARI
+========================================================= */
+
+function orientation(a,b,c){
+
+  const value =
+    (b[1]-a[1])*(c[0]-b[0]) -
+    (b[0]-a[0])*(c[1]-b[1]);
+
+  if(Math.abs(value) < 1e-12){
+    return 0;
+  }
+
+  return value > 0 ? 1 : 2;
+}
+
+
+function onSegment(a,b,c){
+
+  return (
+    Math.min(a[0],c[0]) <= b[0] &&
+    b[0] <= Math.max(a[0],c[0]) &&
+    Math.min(a[1],c[1]) <= b[1] &&
+    b[1] <= Math.max(a[1],c[1])
+  );
+}
+
+
+function segmentsIntersect(p1,q1,p2,q2){
+
+  const o1 = orientation(p1,q1,p2);
+  const o2 = orientation(p1,q1,q2);
+  const o3 = orientation(p2,q2,p1);
+  const o4 = orientation(p2,q2,q1);
+
+  if(o1 !== o2 && o3 !== o4){
+    return true;
+  }
+
+  if(o1 === 0 && onSegment(p1,p2,q1)) return true;
+  if(o2 === 0 && onSegment(p1,q2,q1)) return true;
+  if(o3 === 0 && onSegment(p2,p1,q2)) return true;
+  if(o4 === 0 && onSegment(p2,q1,q2)) return true;
+
+  return false;
+}
+
+
+function pointInPolygon(point, ring){
+
+  let inside = false;
+
+  for(
+    let i=0,j=ring.length-1;
+    i<ring.length;
+    j=i++
+  ){
+
+    const xi = ring[i][0];
+    const yi = ring[i][1];
+
+    const xj = ring[j][0];
+    const yj = ring[j][1];
+
+    const intersect =
+      ((yi > point[1]) !== (yj > point[1])) &&
+      (
+        point[0] <
+        (xj-xi) *
+        (point[1]-yi) /
+        ((yj-yi) || 1e-15) +
+        xi
+      );
+
+    if(intersect){
+      inside = !inside;
+    }
+  }
+
   return inside;
 }
-function polygonPointInside(pt,poly){
-  if(!ringPointInside(pt,poly[0]))return false;
-  for(let i=1;i<poly.length;i++) if(ringPointInside(pt,poly[i])) return false;
-  return true;
-}
-function orient(a,b,c){const v=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);return Math.abs(v)<1e-12?0:v>0?1:2}
-function onSeg(a,b,p){return p[0]>=Math.min(a[0],b[0])-1e-12&&p[0]<=Math.max(a[0],b[0])+1e-12&&p[1]>=Math.min(a[1],b[1])-1e-12&&p[1]<=Math.max(a[1],b[1])+1e-12}
-function segIntersect(a,b,c,d){
-  const o1=orient(a,b,c),o2=orient(a,b,d),o3=orient(c,d,a),o4=orient(c,d,b);
-  if(o1!==o2&&o3!==o4)return true;
-  if(o1===0&&onSeg(a,b,c))return true;
-  if(o2===0&&onSeg(a,b,d))return true;
-  if(o3===0&&onSeg(c,d,a))return true;
-  if(o4===0&&onSeg(c,d,b))return true;
-  return false;
-}
-function ringsIntersect(r1,r2){
-  for(let i=0;i<r1.length-1;i++)for(let j=0;j<r2.length-1;j++)if(segIntersect(r1[i],r1[i+1],r2[j],r2[j+1]))return true;
-  return false;
-}
-function polyIntersect(a,b){
-  if(!Array.isArray(a)||!Array.isArray(b)||!a.length||!b.length) return false;
 
-  for(const ra of a){
-    if(!Array.isArray(ra)||ra.length<2) continue;
 
-    for(const rb of b){
-      if(!Array.isArray(rb)||rb.length<2) continue;
+function polygonIntersects(polyA, polyB){
 
-      if(ringsIntersect(ra,rb)) return true;
+  const outerA = polyA[0] || [];
+  const outerB = polyB[0] || [];
+
+  if(outerA.length < 3 || outerB.length < 3){
+    return false;
+  }
+
+  for(
+    let i=0;
+    i<outerA.length;
+    i++
+  ){
+
+    const a1 = outerA[i];
+    const a2 =
+      outerA[(i+1)%outerA.length];
+
+    for(
+      let j=0;
+      j<outerB.length;
+      j++
+    ){
+
+      const b1 = outerB[j];
+      const b2 =
+        outerB[(j+1)%outerB.length];
+
+      if(
+        segmentsIntersect(
+          a1,a2,b1,b2
+        )
+      ){
+        return true;
+      }
     }
   }
 
-  const ap=a[0]?.[0];
-  const bp=b[0]?.[0];
+  if(pointInPolygon(outerA[0],outerB)){
+    return true;
+  }
 
-  if(ap && polygonPointInside(ap,b)) return true;
-  if(bp && polygonPointInside(bp,a)) return true;
+  if(pointInPolygon(outerB[0],outerA)){
+    return true;
+  }
 
   return false;
 }
-function geometryIntersection(A,B){
-  for(const pa of A.polygons)for(const pb of B.polygons)if(polyIntersect(pa,pb))return true;
+
+
+function polygonsIntersect(polygonsA,polygonsB){
+
+  for(const a of polygonsA){
+
+    for(const b of polygonsB){
+
+      if(polygonIntersects(a,b)){
+        return true;
+      }
+    }
+  }
+
   return false;
 }
+
+
+/* =========================================================
+   KESİŞİM MOTORU
+========================================================= */
+
 function calculateIntersection(){
-  const box=document.getElementById("geoResult");
-  if(!parcelGeoJSON || !planGeoJSON || !parcelGeoJSON.polygons || !planGeoJSON.polygons){
-    box.className="geo-result open";
-    box.innerHTML="<b>HESAPLANAMADI</b><p>Hem parsel hem plan geometrisini yüklemelisin. Eksik veri, kesişim varmış gibi yorumlanmaz.</p>";
+
+  const result = $("geoResult");
+
+  if(!parcelGeometry || !planGeometry){
+
+    result.innerHTML = `
+      <div class="result-head">
+        <b>GEOMETRİ EKSİK</b>
+        <span class="badge yellow">
+          Hesaplama yapılamadı
+        </span>
+      </div>
+
+      <div class="result-body">
+        Hem <b>parsel geometrisi</b> hem de
+        <b>plan geometrisi</b> yüklenmelidir.
+      </div>
+    `;
+
+    intersectionState.checked = false;
+
+    updateRadarPreview();
+
     return;
   }
-  const hit=geometryIntersection(parcelGeoJSON,planGeoJSON);
-  const p=PARSELLER.find(x=>x.id==="istanbul-catalca-ovayenice-134-11");
-  if(p){p.geometryStatus="verified";p.intersectionStatus=hit?"intersects":"disjoint";}
-  box.className="geo-result "+(hit?"verified":"no");
-  box.innerHTML=hit
-    ? "<b>🟢 KESİŞİYOR</b><p>Yüklenen parsel geometrisi ile plan geometrisi arasında mekânsal kesişim tespit edildi.</p><p><b>Not:</b> Bu sonuç planın yapılaşma hakkı verdiği anlamına gelmez; plan kararının niteliği ve uygulama koşulları ayrıca incelenmelidir.</p>"
-    : "<b>🔴 KESİŞMİYOR</b><p>Yüklenen geometriler arasında kesişim tespit edilmedi.</p><p><b>Not:</b> Geometri ve koordinat sisteminin aynı referans sisteminde olması gerekir.</p>";
-  sec(p?p.id:"istanbul-catalca-ovayenice-134-11");
-}
-function clearGeometry(){
-  parcelGeoJSON=null;planGeoJSON=null;
-  document.getElementById("parcelGeo").value="";
-  document.getElementById("planGeo").value="";
-  document.getElementById("parcelFileStatus").textContent="Dosya yüklenmedi.";
-  document.getElementById("planFileStatus").textContent="Dosya yüklenmedi.";
-  document.getElementById("geoResult").className="geo-result open";
-  document.getElementById("geoResult").innerHTML="<b>MEVCUT DURUM: GEOMETRİ BEKLENİYOR</b><p>Parsel ve plan poligonu yüklenmeden mekânsal kesişim doğrulanamaz.</p>";
+
+  const intersects =
+    polygonsIntersect(
+      parcelGeometry,
+      planGeometry
+    );
+
+  intersectionState = {
+    checked:true,
+    intersects,
+    parcelCount:parcelGeometry.length,
+    planCount:planGeometry.length
+  };
+
+  if(intersects){
+
+    result.innerHTML = `
+      <div class="result-head">
+        <b>GEOMETRİK KESİŞİM TESPİT EDİLDİ</b>
+        <span class="badge green">
+          KESİŞİYOR
+        </span>
+      </div>
+
+      <div class="result-body">
+
+        <div class="success">
+          Parsel geometrisi ile plan geometrisi arasında
+          mekansal kesişim bulundu.
+        </div>
+
+        <div class="stats" style="margin-top:16px">
+
+          <div class="stat">
+            <div class="label">Parsel geometrisi</div>
+            <div class="value">
+              ${parcelGeometry.length}
+            </div>
+          </div>
+
+          <div class="stat">
+            <div class="label">Plan geometrisi</div>
+            <div class="value">
+              ${planGeometry.length}
+            </div>
+          </div>
+
+          <div class="stat">
+            <div class="label">Sonuç</div>
+            <div class="value">EVET</div>
+          </div>
+
+          <div class="stat">
+            <div class="label">Plan sinyali</div>
+            <div class="value">
+              ${$("planSinyali").selectedOptions[0].textContent}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+  }else{
+
+    result.innerHTML = `
+      <div class="result-head">
+        <b>GEOMETRİK KESİŞİM YOK</b>
+        <span class="badge red">
+          KESİŞMİYOR
+        </span>
+      </div>
+
+      <div class="result-body">
+
+        <div class="danger">
+          Yüklenen parsel ve plan geometrileri
+          arasında kesişim tespit edilmedi.
+        </div>
+
+        <p class="muted small" style="margin-bottom:0">
+          Bu sonuç, yüklenen geometrilerin doğruluğuna bağlıdır.
+        </p>
+
+      </div>
+    `;
+  }
+
+  updateRadarPreview();
 }
 
-function resetForm(){document.getElementById("il").value="";document.getElementById("ilce").value="";document.getElementById("mah").value="";document.getElementById("butce").value=30000000;document.getElementById("m2max").value=5000;document.getElementById("amin").value=300;document.getElementById("amax").value=30000;document.getElementById("smin").value=0;document.getElementById("dog").checked=false;fillSelects();tara()}
-function exportData(){const blob=new Blob([JSON.stringify({generatedAt:new Date().toISOString(),planIntelligence:PLAN_ISTIH,parcels:PARSELLER},null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="arsa-radar-v5-data.json";a.click();URL.revokeObjectURL(a.href)}
-fillSelects();tara();
+
+function clearGeometry(){
+
+  parcelGeometry = null;
+  planGeometry = null;
+
+  intersectionState = {
+    checked:false,
+    intersects:false,
+    parcelCount:0,
+    planCount:0
+  };
+
+  $("parcelGeo").value = "";
+  $("planGeo").value = "";
+
+  setText(
+    "parcelFileStatus",
+    "Dosya yüklenmedi."
+  );
+
+  setText(
+    "planFileStatus",
+    "Dosya yüklenmedi."
+  );
+
+  $("geoResult").innerHTML = `
+    <div class="result-head">
+      <b>MEVCUT DURUM</b>
+      <span class="badge gray">
+        Geometri bekleniyor
+      </span>
+    </div>
+
+    <div class="result-body muted">
+      Parsel ve plan geometrisi yüklenmeden
+      mekansal kesişim doğrulanamaz.
+    </div>
+  `;
+
+  updateRadarPreview();
+}
+
+
+function updateGeometryBadge(){
+
+  if(parcelGeometry && planGeometry){
+
+    $("geoResult").querySelector(".badge").textContent =
+      "Hazır";
+
+    $("geoResult").querySelector(".badge").className =
+      "badge blue";
+  }
+}
+
+
+/* =========================================================
+   RADAR SKORU
+========================================================= */
+
+function calculateScore(){
+
+  const plan =
+    Number($("planSinyali").value) || 0;
+
+  const road =
+    Number($("ulasan").value) || 0;
+
+  const env =
+    Number($("cevre").value) || 0;
+
+  let geo = 0;
+
+  if(
+    intersectionState.checked &&
+    intersectionState.intersects
+  ){
+    geo = 30;
+  }
+
+  else if(
+    intersectionState.checked &&
+    !intersectionState.intersects
+  ){
+    geo = 0;
+  }
+
+  /*
+    Maksimum:
+    Plan 40
+    Geometri 30
+    Ulaşım 15
+    Çevre 15
+    = 100
+  */
+
+  return {
+    plan,
+    geo,
+    road,
+    env,
+    total:plan+geo+road+env
+  };
+}
+
+
+function runRadar(){
+
+  const score = calculateScore();
+
+  setText(
+    "statPlan",
+    score.plan
+  );
+
+  setText(
+    "statGeo",
+    score.geo
+  );
+
+  setText(
+    "statRoad",
+    score.road
+  );
+
+  setText(
+    "statEnv",
+    score.env
+  );
+
+  setText(
+    "scoreValue",
+    score.total
+  );
+
+  $("scoreProgress").style.width =
+    score.total + "%";
+
+  $("scoreProgress").className = "";
+
+  if(score.total >= 70){
+
+    $("scoreProgress").classList.add(
+      "score-green"
+    );
+
+    setText(
+      "scoreLabel",
+      "Yüksek öncelikli inceleme"
+    );
+
+    $("radarComment").className =
+      "success";
+
+    $("radarComment").textContent =
+      "Güçlü sinyal bulundu. Resmî plan ve mülkiyet verileriyle derinlemesine doğrulama yapılması önerilir.";
+
+  }
+
+  else if(score.total >= 45){
+
+    $("scoreProgress").classList.add(
+      "score-yellow"
+    );
+
+    setText(
+      "scoreLabel",
+      "İncelenmeye değer"
+    );
+
+    $("radarComment").className =
+      "warning";
+
+    $("radarComment").textContent =
+      "Orta seviyede fırsat sinyali var. Karar vermeden önce plan geometrisi, ulaşım ve resmî kararlar doğrulanmalı.";
+
+  }
+
+  else{
+
+    $("scoreProgress").classList.add(
+      "score-red"
+    );
+
+    setText(
+      "scoreLabel",
+      "Zayıf / doğrulama gerekli"
+    );
+
+    $("radarComment").className =
+      "danger";
+
+    $("radarComment").textContent =
+      "Mevcut sinyaller güçlü bir fırsat oluşturmuyor. Ek veri olmadan ileri karar verilmemeli.";
+
+  }
+
+  updateDecisionTable(score);
+
+}
+
+
+/* =========================================================
+   KARAR TABLOSU
+========================================================= */
+
+function updateDecisionTable(score){
+
+  const planText =
+    $("planSinyali").selectedOptions[0].textContent;
+
+  const roadText =
+    $("ulasan").selectedOptions[0].textContent;
+
+  const envText =
+    $("cevre").selectedOptions[0].textContent;
+
+  const geoText =
+    !intersectionState.checked
+      ? "Kontrol edilmedi"
+      : intersectionState.intersects
+        ? "Kesişiyor"
+        : "Kesişmiyor";
+
+  const geoEffect =
+    !intersectionState.checked
+      ? "—"
+      : intersectionState.intersects
+        ? "+30"
+        : "0";
+
+  $("decisionTable").innerHTML = `
+
+    <tr>
+      <td>Plan</td>
+      <td>
+        <span class="badge blue">
+          ${escapeHtml(planText)}
+        </span>
+      </td>
+      <td>+${score.plan}</td>
+      <td>
+        Seçilen plan sinyalinin ön eleme skoruna etkisi.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Geometri</td>
+      <td>
+        <span class="badge ${
+          intersectionState.intersects
+            ? "green"
+            : intersectionState.checked
+              ? "red"
+              : "gray"
+        }">
+          ${geoText}
+        </span>
+      </td>
+      <td>${geoEffect}</td>
+      <td>
+        Gerçek parsel ve plan geometrilerinin
+        mekansal karşılaştırması.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Ulaşım</td>
+      <td>${escapeHtml(roadText)}</td>
+      <td>+${score.road}</td>
+      <td>
+        Yol ve ulaşım sinyalinin ön eleme etkisi.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Çevre</td>
+      <td>${escapeHtml(envText)}</td>
+      <td>+${score.env}</td>
+      <td>
+        Çevredeki gelişim sinyalinin ön eleme etkisi.
+      </td>
+    </tr>
+
+  `;
+
+  updateDecisionBox(score);
+}
+
+
+function updateDecisionBox(score){
+
+  const box = $("decisionBox");
+
+  if(score.total >= 70){
+
+    box.className = "success";
+
+    box.innerHTML = `
+      <b>RADAR SONUCU: YÜKSEK ÖNCELİKLİ</b><br>
+      Skor ${score.total}/100.
+      Bu parsel daha ileri doğrulama için
+      önceliklendirilebilir.
+    `;
+
+  }
+
+  else if(score.total >= 45){
+
+    box.className = "warning";
+
+    box.innerHTML = `
+      <b>RADAR SONUCU: İNCELENEBİLİR</b><br>
+      Skor ${score.total}/100.
+      Daha güçlü karar için resmî plan,
+      geometri ve mülkiyet verileri kontrol edilmelidir.
+    `;
+
+  }
+
+  else{
+
+    box.className = "danger";
+
+    box.innerHTML = `
+      <b>RADAR SONUCU: ZAYIF SİNYAL</b><br>
+      Skor ${score.total}/100.
+      Mevcut veriler güçlü bir fırsat göstermiyor.
+    `;
+
+  }
+}
+
+
+function updateRadarPreview(){
+
+  const score = calculateScore();
+
+  setText(
+    "statPlan",
+    score.plan
+  );
+
+  setText(
+    "statGeo",
+    score.geo
+  );
+
+  setText(
+    "statRoad",
+    score.road
+  );
+
+  setText(
+    "statEnv",
+    score.env
+  );
+}
+
+
+/* =========================================================
+   KAYDET
+========================================================= */
+
+function collectData(){
+
+  const score = calculateScore();
+
+  return {
+    version:"Arsa Radar V6",
+    timestamp:new Date().toISOString(),
+
+    parcel:{
+      il:$("il").value,
+      ilce:$("ilce").value,
+      ada:$("ada").value,
+      parsel:$("parsel").value,
+      alan:$("alan").value,
+      fiyat:$("fiyat").value,
+      nitelik:$("nitelik").value,
+      kaynak:$("kaynak").value
+    },
+
+    signals:{
+      plan:$("planSinyali").value,
+      planText:$("planSinyali").selectedOptions[0].textContent,
+      road:$("ulasan").value,
+      roadText:$("ulasan").selectedOptions[0].textContent,
+      environment:$("cevre").value,
+      environmentText:$("cevre").selectedOptions[0].textContent
+    },
+
+    geometry:{
+      checked:intersectionState.checked,
+      intersects:intersectionState.intersects,
+      parcelPolygons:intersectionState.parcelCount,
+      planPolygons:intersectionState.planCount
+    },
+
+    score,
+
+    notes:$("notlar").value
+  };
+}
+
+
+function saveAnalysis(){
+
+  const data = collectData();
+
+  localStorage.setItem(
+    "arsaRadarV6",
+    JSON.stringify(data)
+  );
+
+  $("decisionBox").className =
+    "success";
+
+  $("decisionBox").innerHTML = `
+    <b>ANALİZ KAYDEDİLDİ.</b><br>
+    Bu analiz bu tarayıcıda saklandı.
+  `;
+}
+
+
+function loadAnalysis(){
+
+  const raw =
+    localStorage.getItem(
+      "arsaRadarV6"
+    );
+
+  if(!raw) return;
+
+  try{
+
+    const data = JSON.parse(raw);
+
+    if(data.parcel){
+
+      $("il").value =
+        data.parcel.il || "";
+
+      $("ilce").value =
+        data.parcel.ilce || "";
+
+      $("ada").value =
+        data.parcel.ada || "";
+
+      $("parsel").value =
+        data.parcel.parsel || "";
+
+      $("alan").value =
+        data.parcel.alan || "";
+
+      $("fiyat").value =
+        data.parcel.fiyat || "";
+
+      $("nitelik").value =
+        data.parcel.nitelik || "Arsa";
+
+      $("kaynak").value =
+        data.parcel.kaynak || "TKGM / MEGSİS";
+    }
+
+    if(data.signals){
+
+      $("planSinyali").value =
+        data.signals.plan || "0";
+
+      $("ulasan").value =
+        data.signals.road || "0";
+
+      $("cevre").value =
+        data.signals.environment || "0";
+    }
+
+    $("notlar").value =
+      data.notes || "";
+
+    updateRadarPreview();
+
+  }catch(error){
+
+    console.warn(
+      "Kayıt okunamadı",
+      error
+    );
+
+  }
+}
+
+
+/* =========================================================
+   JSON RAPORU
+========================================================= */
+
+function exportReport(){
+
+  const data = collectData();
+
+  const json =
+    JSON.stringify(
+      data,
+      null,
+      2
+    );
+
+  const blob =
+    new Blob(
+      [json],
+      {type:"application/json"}
+    );
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const a =
+    document.createElement("a");
+
+  a.href = url;
+
+  const ada =
+    $("ada").value || "ada";
+
+  const parsel =
+    $("parsel").value || "parsel";
+
+  a.download =
+    `arsa-radar-${ada}-${parsel}.json`;
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+  URL.revokeObjectURL(url);
+}
+
+
+/* =========================================================
+   OTOMATİK GÜNCELLEME
+========================================================= */
+
+[
+  "planSinyali",
+  "ulasan",
+  "cevre"
+].forEach(id => {
+
+  $(id).addEventListener(
+    "change",
+    updateRadarPreview
+  );
+
+});
+
+
+/* =========================================================
+   BAŞLANGIÇ
+========================================================= */
+
+loadAnalysis();
+updateRadarPreview();
+
 </script>
+
 </body>
 </html>
