@@ -1955,6 +1955,781 @@ function exportReport(){
 
 loadAnalysis();
 updateRadarPreview();
+<!-- =========================
+     ARSA RADAR V6.1
+     FIREVIBE WEB MVP LAYER
+========================= -->
+
+<style>
+#radarMvp{
+  margin:0 0 20px;
+}
+
+.radar-nav{
+  position:sticky;
+  top:10px;
+  z-index:50;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  padding:10px;
+  margin-bottom:18px;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(10px);
+  border:1px solid #dbe2ea;
+  border-radius:14px;
+  box-shadow:0 8px 25px rgba(15,23,42,.08);
+}
+
+.radar-nav button{
+  padding:9px 13px;
+  font-size:13px;
+  background:#f8fafc;
+  color:#172033;
+  border:1px solid #dbe2ea;
+}
+
+.radar-nav button.active,
+.radar-nav button:hover{
+  background:#0b1220;
+  color:white;
+}
+
+.radar-dashboard{
+  display:grid;
+  grid-template-columns:1.1fr 1fr 1fr;
+  gap:14px;
+}
+
+.radar-score-card{
+  background:linear-gradient(135deg,#0b1220,#17243a);
+  color:white;
+  border-radius:18px;
+  padding:22px;
+}
+
+.radar-score{
+  font-size:64px;
+  line-height:1;
+  font-weight:900;
+  margin:8px 0;
+}
+
+.radar-status{
+  display:inline-block;
+  padding:7px 11px;
+  border-radius:999px;
+  background:rgba(255,255,255,.14);
+  font-size:12px;
+  font-weight:800;
+}
+
+.radar-mini{
+  background:#fff;
+  border:1px solid #dbe2ea;
+  border-radius:18px;
+  padding:20px;
+}
+
+.radar-mini-value{
+  font-size:30px;
+  font-weight:900;
+  margin-top:5px;
+}
+
+.radar-meter{
+  height:10px;
+  background:#e2e8f0;
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+.radar-meter span{
+  display:block;
+  height:100%;
+  width:0;
+  transition:.4s;
+  background:#16a34a;
+}
+
+.radar-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:14px;
+}
+
+.radar-factor{
+  padding:14px;
+  border:1px solid #dbe2ea;
+  border-radius:12px;
+  background:#f8fafc;
+}
+
+.radar-factor b{
+  display:block;
+  font-size:20px;
+  margin-top:4px;
+}
+
+.radar-opportunity{
+  margin-top:16px;
+  padding:18px;
+  border-radius:14px;
+  border:1px solid #bfdbfe;
+  background:#eff6ff;
+}
+
+.radar-opportunity strong{
+  font-size:18px;
+}
+
+.radar-portfolio{
+  margin-top:16px;
+}
+
+.radar-portfolio-list{
+  display:grid;
+  gap:8px;
+  margin-top:10px;
+}
+
+.radar-portfolio-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  background:#f8fafc;
+  border:1px solid #dbe2ea;
+  border-radius:10px;
+}
+
+@media(max-width:850px){
+  .radar-dashboard{
+    grid-template-columns:1fr;
+  }
+
+  .radar-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:520px){
+  .radar-grid{
+    grid-template-columns:1fr;
+  }
+
+  .radar-score{
+    font-size:52px;
+  }
+}
+</style>
+
+<script>
+(function(){
+
+  const $ = id => document.getElementById(id);
+
+  function num(id){
+    const el = $(id);
+    if(!el) return 0;
+    return Number(el.value) || 0;
+  }
+
+  function val(id){
+    const el = $(id);
+    return el ? el.value : "";
+  }
+
+  function calculateRadar(){
+
+    const plan = num("planSinyali");
+    const ulasim = num("ulasan");
+    const cevre = num("cevre");
+
+    const alan = num("alan");
+    const fiyat = num("fiyat");
+
+    let fiyatScore = 0;
+
+    if(alan > 0 && fiyat > 0){
+
+      const m2 = fiyat / alan;
+
+      /*
+       * İlk MVP'de fiyat/m² puanı piyasa verisi iddiası taşımaz.
+       * Sadece kullanıcının girdiği fiyatı görünür hale getirir.
+       */
+      if(m2 <= 1000) fiyatScore = 15;
+      else if(m2 <= 2500) fiyatScore = 12;
+      else if(m2 <= 5000) fiyatScore = 8;
+      else if(m2 <= 10000) fiyatScore = 4;
+      else fiyatScore = 1;
+    }
+
+    const raw = plan + ulasim + cevre + fiyatScore;
+
+    const score = Math.max(0,Math.min(100,Math.round(raw * 1.25)));
+
+    let status = "ZAYIF";
+    let statusClass = "danger";
+
+    if(score >= 75){
+      status = "GÜÇLÜ FIRSAT";
+      statusClass = "success";
+    }else if(score >= 50){
+      status = "İZLE";
+      statusClass = "warning";
+    }
+
+    const scoreEl = $("radarScore");
+    const statusEl = $("radarStatus");
+    const meter = $("radarMeter");
+
+    if(scoreEl) scoreEl.textContent = score;
+    if(statusEl){
+      statusEl.textContent = status;
+      statusEl.className = "radar-status";
+    }
+
+    if(meter){
+      meter.style.width = score + "%";
+    }
+
+    const planEl = $("radarPlan");
+    const ulasimEl = $("radarUlasim");
+    const cevreEl = $("radarCevre");
+    const fiyatEl = $("radarFiyat");
+
+    if(planEl) planEl.textContent = plan;
+    if(ulasimEl) ulasimEl.textContent = ulasim;
+    if(cevreEl) cevreEl.textContent = cevre;
+    if(fiyatEl) fiyatEl.textContent = fiyatScore;
+
+    const m2El = $("radarM2");
+
+    if(m2El){
+      if(alan > 0 && fiyat > 0){
+        m2El.textContent =
+          new Intl.NumberFormat("tr-TR",{
+            maximumFractionDigits:0
+          }).format(fiyat / alan) + " TL/m²";
+      }else{
+        m2El.textContent = "—";
+      }
+    }
+
+    let reason = "";
+
+    if(plan >= 25){
+      reason += "Güçlü plan sinyali mevcut. ";
+    }else if(plan >= 10){
+      reason += "Plan tarafında takip edilmesi gereken sinyal var. ";
+    }
+
+    if(ulasim >= 10){
+      reason += "Ulaşım avantajı olumlu. ";
+    }
+
+    if(cevre >= 10){
+      reason += "Çevresel gelişim sinyali olumlu. ";
+    }
+
+    if(!reason){
+      reason =
+        "Henüz güçlü bir fırsat sinyali oluşmadı. Veri toplama ve doğrulama devam etmeli.";
+    }
+
+    const reasonEl = $("radarReason");
+
+    if(reasonEl){
+      reasonEl.textContent = reason;
+    }
+
+    return {
+      score,
+      status,
+      il:val("il"),
+      ilce:val("ilce"),
+      ada:val("ada"),
+      parsel:val("parsel"),
+      alan,
+      fiyat,
+      m2:alan && fiyat ? fiyat / alan : 0
+    };
+  }
+
+
+  function createDashboard(){
+
+    const firstSection =
+      document.querySelector("main.wrap > section");
+
+    if(!firstSection) return;
+
+    const box = document.createElement("div");
+
+    box.id = "radarMvp";
+
+    box.innerHTML = `
+
+      <nav class="radar-nav">
+
+        <button class="active" data-target="radarDashboard">
+          Radar
+        </button>
+
+        <button data-target="geometry">
+          Harita / Geometri
+        </button>
+
+        <button data-target="portfolio">
+          Portföy
+        </button>
+
+        <button data-target="geometry">
+          Plan Kesişimi
+        </button>
+
+      </nav>
+
+      <div class="radar-dashboard" id="radarDashboard">
+
+        <div class="radar-score-card">
+
+          <div class="small">
+            ARSA RADAR SKORU
+          </div>
+
+          <div class="radar-score" id="radarScore">
+            0
+          </div>
+
+          <span class="radar-status" id="radarStatus">
+            VERİ BEKLENİYOR
+          </span>
+
+          <div class="radar-meter">
+            <span id="radarMeter"></span>
+          </div>
+
+          <p class="small" style="color:#cbd5e1;margin-bottom:0">
+            Bu skor karar destek amaçlıdır.
+            Resmî değerleme veya yatırım garantisi değildir.
+          </p>
+
+        </div>
+
+
+        <div class="radar-mini">
+
+          <div class="muted small">
+            Parsel
+          </div>
+
+          <div class="radar-mini-value" id="radarParcel">
+            —
+          </div>
+
+          <div class="muted small" id="radarLocation">
+            Konum bekleniyor
+          </div>
+
+        </div>
+
+
+        <div class="radar-mini">
+
+          <div class="muted small">
+            Fiyat / m²
+          </div>
+
+          <div class="radar-mini-value" id="radarM2">
+            —
+          </div>
+
+          <div class="muted small">
+            Kullanıcı girdisine göre
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="radar-grid">
+
+        <div class="radar-factor">
+          <span class="muted small">Plan</span>
+          <b id="radarPlan">0</b>
+        </div>
+
+        <div class="radar-factor">
+          <span class="muted small">Ulaşım</span>
+          <b id="radarUlasim">0</b>
+        </div>
+
+        <div class="radar-factor">
+          <span class="muted small">Çevre</span>
+          <b id="radarCevre">0</b>
+        </div>
+
+        <div class="radar-factor">
+          <span class="muted small">Fiyat</span>
+          <b id="radarFiyat">0</b>
+        </div>
+
+      </div>
+
+
+      <div class="radar-opportunity">
+
+        <strong>Radar Yorumu</strong>
+
+        <div id="radarReason" style="margin-top:6px">
+          Parsel verileri girildiğinde analiz başlayacak.
+        </div>
+
+      </div>
+
+
+      <div class="card radar-portfolio" id="portfolio">
+
+        <h3>Portföy</h3>
+
+        <p class="muted small">
+          İncelediğin parselleri tarayıcı üzerinde kaydet.
+        </p>
+
+        <div class="actions">
+
+          <button class="green" id="addPortfolio">
+            + Portföye ekle
+          </button>
+
+          <button class="secondary" id="clearPortfolio">
+            Portföyü temizle
+          </button>
+
+        </div>
+
+        <div
+          class="radar-portfolio-list"
+          id="portfolioList">
+        </div>
+
+      </div>
+
+    `;
+
+    firstSection.parentNode.insertBefore(box,firstSection);
+  }
+
+
+  function update(){
+
+    const data = calculateRadar();
+
+    const parcelEl = $("radarParcel");
+    const locationEl = $("radarLocation");
+
+    if(parcelEl){
+
+      if(data.ada || data.parsel){
+
+        parcelEl.textContent =
+          (data.ada || "—") +
+          " / " +
+          (data.parsel || "—");
+
+      }else{
+        parcelEl.textContent = "—";
+      }
+    }
+
+    if(locationEl){
+
+      const parts =
+        [data.il,data.ilce].filter(Boolean);
+
+      locationEl.textContent =
+        parts.length
+          ? parts.join(" / ")
+          : "Konum bekleniyor";
+    }
+  }
+
+
+  function getPortfolio(){
+
+    try{
+      return JSON.parse(
+        localStorage.getItem("arsaRadarPortfolio") || "[]"
+      );
+    }catch(e){
+      return [];
+    }
+  }
+
+
+  function savePortfolio(list){
+
+    localStorage.setItem(
+      "arsaRadarPortfolio",
+      JSON.stringify(list)
+    );
+  }
+
+
+  function renderPortfolio(){
+
+    const listEl = $("portfolioList");
+
+    if(!listEl) return;
+
+    const list = getPortfolio();
+
+    if(!list.length){
+
+      listEl.innerHTML =
+        '<div class="muted small">Portföy henüz boş.</div>';
+
+      return;
+    }
+
+    listEl.innerHTML = list.map((x,i)=>`
+
+      <div class="radar-portfolio-item">
+
+        <div>
+
+          <b>
+            ${escapeHtml(
+              (x.ilce || "") +
+              " " +
+              (x.ada || "—") +
+              "/" +
+              (x.parsel || "—")
+            )}
+          </b>
+
+          <div class="small muted">
+            Radar Skoru: ${x.score}
+            · ${escapeHtml(x.status)}
+          </div>
+
+        </div>
+
+        <button
+          class="secondary"
+          data-remove="${i}">
+          Sil
+        </button>
+
+      </div>
+
+    `).join("");
+
+    listEl.querySelectorAll("[data-remove]")
+      .forEach(btn=>{
+
+        btn.onclick = function(){
+
+          const list = getPortfolio();
+
+          list.splice(
+            Number(this.dataset.remove),
+            1
+          );
+
+          savePortfolio(list);
+
+          renderPortfolio();
+        };
+
+      });
+  }
+
+
+  function escapeHtml(str){
+
+    return String(str || "")
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#039;");
+  }
+
+
+  function addCurrentToPortfolio(){
+
+    const data = calculateRadar();
+
+    if(!data.ada && !data.parsel){
+
+      alert("Önce ada ve parsel bilgisini gir.");
+
+      return;
+    }
+
+    const list = getPortfolio();
+
+    list.unshift({
+
+      id:Date.now(),
+
+      il:data.il,
+      ilce:data.ilce,
+      ada:data.ada,
+      parsel:data.parsel,
+
+      alan:data.alan,
+      fiyat:data.fiyat,
+      m2:data.m2,
+
+      score:data.score,
+      status:data.status,
+
+      createdAt:
+        new Date().toLocaleString("tr-TR")
+
+    });
+
+    savePortfolio(list);
+
+    renderPortfolio();
+
+    alert("Parsel portföye eklendi.");
+  }
+
+
+  function bindInputs(){
+
+    [
+      "il",
+      "ilce",
+      "ada",
+      "parsel",
+      "alan",
+      "fiyat",
+      "planSinyali",
+      "ulasan",
+      "cevre"
+    ].forEach(id=>{
+
+      const el = $(id);
+
+      if(!el) return;
+
+      el.addEventListener(
+        "input",
+        update
+      );
+
+      el.addEventListener(
+        "change",
+        update
+      );
+
+    });
+  }
+
+
+  function bindNavigation(){
+
+    document
+      .querySelectorAll(".radar-nav button")
+      .forEach(btn=>{
+
+        btn.onclick = function(){
+
+          document
+            .querySelectorAll(".radar-nav button")
+            .forEach(x=>
+              x.classList.remove("active")
+            );
+
+          this.classList.add("active");
+
+          const target =
+            $(this.dataset.target);
+
+          if(target){
+
+            target.scrollIntoView({
+              behavior:"smooth",
+              block:"start"
+            });
+
+          }
+
+        };
+
+      });
+
+  }
+
+
+  function init(){
+
+    createDashboard();
+
+    bindInputs();
+
+    bindNavigation();
+
+    const add = $("addPortfolio");
+
+    if(add){
+      add.onclick =
+        addCurrentToPortfolio;
+    }
+
+    const clear = $("clearPortfolio");
+
+    if(clear){
+
+      clear.onclick = function(){
+
+        if(confirm(
+          "Portföydeki tüm kayıtlar silinsin mi?"
+        )){
+
+          localStorage.removeItem(
+            "arsaRadarPortfolio"
+          );
+
+          renderPortfolio();
+
+        }
+
+      };
+
+    }
+
+    renderPortfolio();
+
+    update();
+  }
+
+
+  if(document.readyState === "loading"){
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      init
+    );
+
+  }else{
+
+    init();
+
+  }
+
+})();
 
 </script>
 
